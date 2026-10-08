@@ -1,0 +1,314 @@
+const { test, expect } =
+  require('@playwright/test');
+  require('dotenv').config();
+//This test is written by Jade of Team Eagle
+//Edit date of 102
+
+//Every radio button / dropdown option available on each field is listed in a
+//comment above the line that interacts with it, so the value can be swapped easily.
+test('WP Application', async ({ page }) => {
+
+  /////////// Login for Admin///////////
+  //await page.goto(process.env.WYO_OLDDEV_LOGIN); // DEV
+  await page.goto(process.env.WYO_PPP_LOGIN);    // PPP
+  /////////// Login for Admin///////////
+  await page.getByRole('textbox', { name: 'Email' }).click();
+  await page.getByRole('textbox', { name: 'Email' }).fill(process.env.CASEMAN_WYO_EMAIL);
+  //await page.getByRole('textbox', { name: 'Password' }).click();
+
+  //await page.getByRole('textbox', { name: 'Password' }).fill(process.env.OLD_DEV_PASS); // DEV and New DEV
+  await page.getByRole('textbox', { name: 'Password' }).fill(process.env.PPP_PASS);  // PPP
+  await page.pause();
+  await page.getByRole('button', { name: 'Login' }).click();
+  //login//
+
+  await page.getByRole('button', { name: 'Individuals' }).click();
+  await page.getByRole('tab', { name: 'All Individuals' }).click();
+  
+  await page.getByRole('cell', { name: process.env.JOBSIK_NAME, exact: true }).waitFor({ state: 'visible', timeout: 60000 });
+  await page.getByRole('cell', { name: process.env.JOBSIK_NAME, exact: true }).click();
+  // Select a Program options: CCP | Wagner Peyser | WIN | WIOA | IDST | SNAP E&T
+  await page.pause()
+  await page.getByRole('radio', { name: 'Wagner Peyser' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  
+  await page.waitForTimeout(3000);
+  //page 1 - Basic Information
+  await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
+  await page.waitForTimeout(3000);
+  
+  //page 2 - Demographic Information
+  // (this page also has these dropdowns, not interacted with here:
+  //  Gender: Female | Male | I Do Not Wish to Answer
+  //  Sexual Orientation: Straight/Heterosexual | Gay/Lesbian or Homosexual | Bisexual | Another sexual orientation | I Do Not Wish to Answer
+  //  Registered with the Selective Service: Yes | Documented exemption from registration | No | Not Applicable | Registration Waived
+  //  Citizenship: Citizen of U.S. or U.S. Territory | U.S. Permanent Resident | Alien/Refugee Lawfully Admitted to U.S. | None of the above
+  //  Hispanic/Latino Heritage (radio): Yes | No | Information Not Provided
+  //  Race (checkboxes): White | Black or African American | Asian | American Indian or Alaskan Native | Native Hawaiian or other Pacific Islander | Middle Eastern or North African | Unknown
+  //  Disability disclosure (radio): Yes, I have a disability. | No, I do not have a disability. | I do not wish to disclose my disability status.)
+  
+  //////////////////// Saved and Closed - Page 2 ///////////////////////////////
+  await page.getByRole('button', { name: 'Cancel button. Click to reset' }).click();
+  await page.getByRole('button', { name: 'Yes' }).click();
+  await page.getByRole('button', { name: 'Edit application' }).click();
+  await page.getByRole('checkbox', { name: 'Wagner-Peyser' }).check();
+  await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
+  await page.waitForTimeout(3000);
+  // Returned to page 2
+  
+
+  await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
+  await page.waitForTimeout(3000);
+
+  //page 3 - Veterans Information
+  // (this page also has these radiogroups, not interacted with here:
+  //  Spouse/caregiver of wounded service member: Yes | No | I do not wish to disclose
+  //  Spouse died of service-connected disability: Yes | No | I do not wish to disclose
+  //  Spouse has total/permanent service-connected disability rating: Yes | No | I do not wish to disclose
+  //  Active-duty spouse status: Missing in action | Captured in the line of duty by a hostile force | Forcibly detained or interned by a foreign government power | None of the above
+  //  Are you currently in the U.S. Military or a Veteran?: Yes | No)
+  await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
+  await page.waitForTimeout(3000);
+  //page 4
+
+
+  // Employment Status options: Employed | Employed, but Received Notice of Termination of Employment or Military Separation is pending | Not in labor force, not actively looking for work (including Incarcerated Individuals) | Unemployed, looking for work
+  
+  //await page.getByText('Employment Status').click(); // check why not automated
+  //await page.getByRole('option', { name: 'Employed', exact: true }).click();
+
+  // In a Registered Apprenticeship Program options: Yes | No | Not Disclosed
+  await page.getByRole('radiogroup', { name: 'In a Registered' }).getByLabel('No', { exact: true }).click();
+  // Unemployment Eligibility Status options: Neither Claimant nor Exhaustee | Eligible Claimant referred by WPRS (disabled) | Claimant | Exhaustee | Unknown
+  await page.getByRole('radio', { name: 'Neither Claimant nor Exhaustee' }).click();
+  // Long-Term Unemployed options: Yes, Unemployed >= 27 consecutive weeks | Yes, other Disaster DWG LTU definition | Yes, Unemployed >= 27 non-consecutive weeks in past 12 months | No
+  await page.getByRole('radiogroup', { name: 'Long-Term Unemployed *' }).getByLabel('No', { exact: true }).click();
+  // Attended a Rapid Response Orientation options: Yes | No
+  await page.getByRole('radiogroup', { name: 'Attended a Rapid Response' }).getByLabel('No', { exact: true }).click();
+  // Eligible Migrant and Seasonal Farmworker Status options: Seasonal Farmworker Adult | Migrant Farmworker Adult | MSFW Youth | Dependent Adult | Dependent Youth | No
+  await page.getByLabel('data[').getByText('SelectSelectRemove item').click();
+  await page.getByRole('option', { name: 'Migrant Farmworker Adult' }).click();
+  await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
+  // Unemployed due to layoff or termination options: Yes | No
+  await page.getByRole('radiogroup', { name: 'Unemployed due to layoff or' }).getByLabel('No').click();
+  await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
+  
+   //////////////////// Saved and Closed - Page 4 ///////////////////////////////
+  await page.getByRole('button', { name: 'Cancel button. Click to reset' }).click();
+  await page.getByRole('button', { name: 'Yes' }).click();
+  await page.getByRole('button', { name: 'Edit application' }).click();
+  await page.getByRole('checkbox', { name: 'Wagner-Peyser' }).check();
+  await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
+  await page.waitForTimeout(3000);
+  await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
+  await page.waitForTimeout(3000);
+  await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
+  await page.waitForTimeout(3000);
+  // Returned to Page 4 
+
+
+  await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
+  await page.waitForTimeout(3000);
+  // Highest School Grade Completed options: No School Grades Completed | 1st Grade Completed | 2nd Grade Completed | 3rd Grade Completed | 4th Grade Completed | 5th Grade Completed | 6th Grade Completed | 7th Grade Completed | 8th Grade Completed | 9th Grade Completed | 10th Grade Completed | 11th Grade Completed | 12th Grade Completed
+  await page.getByLabel('data[highestSchoolGradeCompleted]').getByText('SelectSelectRemove item').click();
+  await page.getByRole('option', { name: '12th Grade Completed' }).click();
+  // Highest Educational Level Completed options: High School Diploma | High School Equivalency Diploma | Certificate of Attendance/Completion (Disabled Individuals) | 1 + year of college or technical schooling | Vocational School Certificate | Associate's Degree | Bachelor's Degree | Higher than bachelor's degree | No Education Level Completed
+  await page.getByLabel('data[highestEducationalLevelCompleted]').getByText('SelectSelectRemove item').click();
+  await page.getByRole('option', { name: 'High School Equivalency' }).click();
+  // School Status options: Yes, Attending High School, Junior High, Middle or Elementary School | Yes, Attending An Alternative High School | Yes, Attending College or a Technical or Vocational School | No, Not Attending Any School
+  await page.getByText('SelectSelectRemove item').click();
+  await page.getByRole('option', { name: 'Yes, Attending High School,' }).click();
+  // Receiving services from Adult Education (WIOA Title II) options: Yes | No | Did Not Self-Identify
+  await page.getByRole('radiogroup', { name: 'Receiving services from Adult' }).getByLabel('No', { exact: true }).click();
+  // Receiving services from YouthBuild options: Yes | No | Did Not Self-Identify
+  await page.getByRole('radiogroup', { name: 'Receiving services from YouthBuild *' }).getByLabel('No', { exact: true }).click();
+  // Receiving services from Job Corps options: Yes | No | Did Not Self-Identify
+  await page.getByRole('radiogroup', { name: 'Receiving services from Job' }).getByLabel('No', { exact: true }).click();
+  // Receiving services from Vocational Education (Carl Perkins) options: Yes | No | Did Not Self-Identify
+  await page.getByRole('radiogroup', { name: 'Receiving services from Vocational Education (Carl Perkins) *' }).getByLabel('No', { exact: true }).click();
+  // Temporary Assistance for Needy Families (TANF) recipient options: Yes | No
+  await page.getByRole('radiogroup', { name: 'Temporary Assistance for' }).getByLabel('No', { exact: true }).click();
+  // Supplemental Security Income (SSI) recipient options: Yes | No
+  await page.getByRole('radiogroup', { name: 'Supplemental Security Income' }).getByLabel('No', { exact: true }).click();
+  // Supplemental Nutrition Assistance Program (SNAP) Recipient options: Yes | No
+  await page.getByRole('radiogroup', { name: 'Supplemental Nutrition' }).getByLabel('No', { exact: true }).click();
+  // General Assistance (GA) Recipient options: Yes | No
+  await page.getByRole('radiogroup', { name: 'General Assistance (GA)' }).getByLabel('No', { exact: true }).click();
+  // Refugee Cash Assistance (RCA) Recipient options: Yes | No
+  await page.getByRole('radiogroup', { name: 'Refugee Cash Assistance (RCA' }).getByLabel('No', { exact: true }).click();
+  // Social Security Disability Insurance (SSDI) recipient options: Yes | No
+  await page.getByRole('radiogroup', { name: 'Social Security Disability' }).getByLabel('No', { exact: true }).click();
+  // Youth Currently living in High Poverty Area options: Yes | No | Not Provided
+  await page.getByRole('radiogroup', { name: 'Youth Currently living in' }).getByLabel('No', { exact: true }).click();
+  // Foster Care Payments options: Yes | No
+  await page.getByRole('radiogroup', { name: 'Foster Care Payments' }).getByLabel('No', { exact: true }).click();
+  // Youth currently receives/eligible for free or reduced lunch options: Yes | No
+  await page.getByRole('radiogroup', { name: 'Youth currently receives, or' }).getByLabel('No', { exact: true }).click();
+  // Receiving Services under SNAP Employment and Training Program options: Yes | No | Unknown
+  await page.getByRole('radiogroup', { name: 'Receiving Services under SNAP' }).getByLabel('No', { exact: true }).click();
+  // Ticket-to-Work Holder issued by Social Security Administration options: Yes | No | Unknown
+  await page.getByRole('radiogroup', { name: 'Ticket-to-Work Holder issued by Social Security Administration' }).getByLabel('No', { exact: true }).click();
+  // The Ticket-to-Work has been assigned an employment network options: Yes | No
+  await page.getByRole('radiogroup', { name: 'The Ticket-to-Work has been assigned an employment network' }).getByLabel('No', { exact: true }).click();
+  await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
+  // page 6 - Barriers and Miscellaneous
+  // English Language Learner options: Yes | No
+  await page.getByRole('radiogroup', { name: 'English Language Learner *' }).getByLabel('No').click();
+  // Basic Skills Deficient/Low Levels of Literacy options: Yes | No
+  await page.getByRole('radiogroup', { name: 'Basic Skills Deficient/Low' }).getByLabel('No').click();
+  // Runaway options: Yes | No
+  await page.getByRole('radiogroup', { name: 'Runaway *' }).getByLabel('No').click();
+  // Foster Care Status options: Yes, Currently In | Yes, Aged Out | Yes,16 & left Foster Care | No
+  await page.getByRole('radiogroup', { name: 'Foster Care Status *' }).getByLabel('Yes, Aged Out').click();
+  // Ex-Offender options: Yes | No | Did not Self-Identify
+  await page.getByRole('radiogroup', { name: 'Ex-Offender *' }).getByLabel('No', { exact: true }).click();
+  // Single Parent options: Yes | No | Did not Self-Identify
+  await page.getByRole('radiogroup', { name: 'Single Parent' }).getByLabel('No', { exact: true }).click();
+  // Within 2 years of exhausting TANF lifetime eligibility options: Yes | No
+  await page.getByRole('radiogroup', { name: 'Within 2 years of exhausting' }).getByLabel('No', { exact: true }).click();
+  // Displaced Homemaker options: Yes | No
+  await page.getByRole('radiogroup', { name: 'Displaced Homemaker' }).getByLabel('No', { exact: true }).click();
+  // Cultural Barriers options: Yes | No | Did not Self-Identify
+  await page.getByRole('radiogroup', { name: 'Cultural Barriers' }).getByLabel('No', { exact: true }).click();
+  // Are you required to pay child support options: Yes | No | Did Not Wish to Identify
+  await page.getByRole('radiogroup', { name: 'Are you required to pay child' }).getByLabel('No', { exact: true }).click();
+  await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
+  // page 7 - Applicant Eligibility (review-only, no options here)
+  await page.getByRole('button', { name: 'Submit button. Click to' }).click();
+  await page.getByRole('button', { name: 'Submit' }).click();
+  await page.pause();
+
+  ///////////////////// Check 102 Activity is Fired ///////////////////////
+  await page.getByRole('tab', { name: 'Activities' }).click();
+
+  const row = page.locator('table tbody tr', { hasText: '102 - P - Initial Assessment' });
+
+  await expect(row.locator('td:nth-child(1)')).toHaveText('102 - P - Initial Assessment');
+  await expect(row.locator('td:nth-child(2)')).toHaveText('Wagner-Peyser');
+  await expect(row.locator('td:nth-child(3)')).toHaveText('09/10/2026');
+  await expect(row.locator('td:nth-child(4)')).toHaveText('09/10/2026');
+  await expect(row.locator('td:nth-child(5)')).toHaveText('12/10/2026');
+  await expect(row.locator('td:nth-child(6)')).toHaveText('09/10/2026');
+  await expect(row.locator('td:nth-child(7)')).toHaveText('Yes'); 
+  await expect(row.locator('td:nth-child(8)')).toHaveText('Closed');
+
+  await page.pause(); 
+
+  ///////////////////// Review Button ///////////////////////
+  await page.getByRole('tab', { name: 'Application' }).click();
+  await page.getByRole('button', { name: 'Preview eligibility' }).first().click(); /// just change this to check which subprogram
+  await page.getByRole('heading', { name: 'Contact information' }).waitFor();
+  
+  // --- Page 1: Basic Information ---
+  await expect(page.getByRole('radiogroup', { name: 'Please review the recommendations' }).getByRole('checkbox', { name: 'Wagner-Peyser' })).toBeChecked();
+  //await expect(page.getByRole('textbox', { name: 'First Name *' })).toHaveValue('SecondJade');
+  //await expect(page.getByRole('textbox', { name: 'Last Name *' })).toHaveValue('Check');
+  //await expect(page.getByRole('textbox', { name: 'Social Security Number (SSN)' })).toHaveValue('657-36-3837');
+  // await expect(page.getByRole('textbox', { name: 'Address Line 1 *' })).toHaveValue('Cheyenne');
+  //await expect(page.locator('.formio-component-state .choices__list--single .choices__item--selectable')).toContainText('Wyoming');
+  //await expect(page.getByRole('textbox', { name: 'City *' })).toHaveValue('Cheyenne');
+  //await expect(page.getByRole('textbox', { name: 'Zip Code *' })).toHaveValue('82001');
+  //await expect(page.getByRole('radiogroup', { name: 'Is Mailing Address same as the Residential Address?' }).getByLabel('Yes', { exact: true })).toBeChecked();
+  //await expect(page.getByRole('textbox', { name: 'Primary Phone Number' })).toHaveValue('3473847383');
+  //await expect(page.getByRole('radiogroup', { name: 'Primary Phone Type *' }).getByLabel('Message Only', { exact: true })).toBeChecked();
+  //await expect(page.getByText('No alternate contact added yet.')).toBeVisible();
+  // --Page 1
+  await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
+  await page.getByRole('heading', { name: 'Demographic Information' }).waitFor();
+
+  // --- Page 2: Demographic Information ---
+  await expect(page.getByRole('textbox', { name: 'Date of Birth *' })).toHaveValue('08/29/2007');
+  await expect(page.getByRole('textbox', { name: 'Age' })).toHaveValue('19');
+  await expect(page.locator('.formio-component-gender .choices__list--single .choices__item--selectable')).toContainText('Male');
+  await expect(page.locator('.formio-component-sexualOrientation .choices__list--single .choices__item--selectable')).toContainText('Straight/Heterosexual');
+  await expect(page.locator('.formio-component-registeredWithTheSelectiveService .choices__list--single .choices__item--selectable')).toContainText('Not Applicable');
+  await expect(page.locator('.formio-component-citizenship .choices__list--single .choices__item--selectable')).toContainText('Citizen of U.S. or U.S. Territory');
+  await expect(page.getByRole('radiogroup', { name: 'Hispanic/Latino Heritage *' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Race *' }).getByRole('checkbox', { name: 'White' })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Do you wish to disclose a disability?' }).getByLabel('No, I do not have a disability.', { exact: true })).toBeChecked();
+  // --Page 2
+  await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
+  await page.getByRole('heading', { name: 'Spouse or Caregiver of a Military Member' }).waitFor();
+
+  // --- Page 3: Veterans Information ---
+  await expect(page.getByRole('radiogroup', { name: 'I am the spouse or family caregiver' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'My spouse was a veteran who died' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'My spouse has (or my deceased spouse had)' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'My active-duty spouse is listed' }).getByLabel('None of the above', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Are you currently in the U.S. Military or a Veteran?' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('heading', { name: 'Eligible Veteran Status' })).toBeVisible();
+  // --Page 3
+  await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
+  await page.getByRole('heading', { name: 'Employment Information' }).waitFor();
+
+  // --- Page 4: Employment Information ---
+  await page.pause();
+  await expect(page.locator('.formio-component-employmentStatus .choices__list--single .choices__item--selectable')).toContainText(' Not in labor force, not actively looking for work');
+  await expect(page.getByRole('radiogroup', { name: 'In a Registered' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radio', { name: 'Neither Claimant nor Exhaustee' })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Long-Term Unemployed *' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Attended a Rapid Response' }).getByLabel('No', { exact: true })).toBeChecked();
+  // Eligible Migrant and Seasonal Farmworker Status
+  await expect(page.locator('.formio-component-eligibleMigrantAndSeasonalFarmworkerStatus .choices__list--single .choices__item--selectable')).toContainText('Migrant Farmworker Adult');
+  await expect(page.getByRole('radiogroup', { name: 'Unemployed due to layoff or' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Have you worked as a farmworker in the last 12 months?' }).getByLabel('No', { exact: true })).toBeChecked();
+  // --Page 4
+  await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
+  await page.getByRole('heading', { name: 'Education Information' }).waitFor();
+
+  // --- Page 5: Education and Public Assistance ---
+  await expect(page.locator('.formio-component-highestSchoolGradeCompleted .choices__list--single .choices__item--selectable')).toContainText('12th Grade Completed');
+  await expect(page.locator('.formio-component-highestEducationalLevelCompleted .choices__list--single .choices__item--selectable')).toContainText('High School Equivalency Diploma');
+  // School Status dropdown
+  await expect(page.locator('.formio-component-schoolStatus .choices__list--single .choices__item--selectable')).toContainText('Yes, Attending High School, Junior High, Middle or Elementary School');
+  await expect(page.getByRole('radiogroup', { name: 'Receiving services from Adult' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Receiving services from YouthBuild *' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Receiving services from Job' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Receiving services from Vocational Education (Carl Perkins) *' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Temporary Assistance for' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Supplemental Security Income' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Supplemental Nutrition' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'General Assistance (GA)' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Refugee Cash Assistance (RCA' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Social Security Disability' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Youth Currently living in' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Foster Care Payments' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Youth currently receives, or' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Receiving Services under SNAP' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Ticket-to-Work Holder issued by Social Security Administration' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'The Ticket-to-Work has been assigned an employment network' }).getByLabel('No', { exact: true })).toBeChecked();
+  // --Page 5
+  await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
+  await page.getByRole('heading', { name: 'Barriers' }).waitFor();
+
+  // --- Page 6: Barriers and Miscellaneous ---
+  await expect(page.getByRole('radiogroup', { name: 'English Language Learner *' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Basic Skills Deficient/Low' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Homeless *' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Runaway *' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Foster Care Status *' }).getByLabel('Yes, Aged Out', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Ex-Offender *' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Single Parent' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Within 2 years of exhausting' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Displaced Homemaker' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Cultural Barriers' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Due to the individual' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Meets Qualifying Barrier for Employment' }).getByLabel('No', { exact: true })).toBeChecked();
+  await expect(page.getByRole('radiogroup', { name: 'Are you required to pay child' }).getByLabel('No', { exact: true })).toBeChecked();
+  // --Page 6
+  await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
+  await page.getByRole('heading', { name: 'Applicant Eligibility' }).waitFor();
+
+  // --- Page 7: Applicant Eligibility ---
+  await expect(page.getByText('Following eligibilities are determined for this applicant')).toBeVisible();
+  await expect(page.getByRole('checkbox', { name: 'WP' })).toBeChecked();
+
+  await page.pause();
+
+
+
+
+
+
+
+});

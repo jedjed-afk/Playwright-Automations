@@ -1,0 +1,1810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Edge — Account &amp; Profile Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#10243E;
+    --slate:#2F5D8A;
+    --slate-bg:#E9EFF5;
+    --slate-dark:#1F4266;
+    --sand:#F6F4EE;
+    --white:#FFFFFF;
+    --success:#2E7D5B;
+    --success-bg:#E7F3ED;
+    --warn:#B7791F;
+    --warn-bg:#FBF1DE;
+    --neutral:#707A8A;
+    --neutral-bg:#EDEFF3;
+    --danger:#B3402A;
+    --danger-bg:#FBEAE5;
+    --border:#DBDEE4;
+    --border-strong:#B9C0CC;
+    --amber:#D98E2B;
+    --rose:#F2E6E1;
+    --font-serif:'Source Serif 4', Georgia, serif;
+    --font-sans:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --radius:6px;
+    --shadow-card:0 1px 2px rgba(16,36,62,0.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--font-sans);
+    background:var(--sand);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  a{color:inherit;}
+  button{font-family:inherit;cursor:pointer;}
+  :focus-visible{outline:3px solid var(--amber);outline-offset:2px;}
+
+  /* ---------- App shell ---------- */
+  #app{min-height:100vh;display:flex;flex-direction:column;}
+
+  header.app-header{
+    background:var(--ink);
+    color:var(--white);
+    display:none;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 28px;
+    height:64px;
+    flex-shrink:0;
+    position:relative;
+    z-index:50;
+  }
+  header.app-header.visible{display:flex;}
+  .brand{
+    display:flex;align-items:center;gap:10px;
+    font-family:var(--font-serif);
+    font-size:20px;font-weight:600;letter-spacing:0.2px;
+    cursor:pointer;background:none;border:none;color:#fff;padding:0;
+  }
+  .brand-mark{
+    width:28px;height:28px;border-radius:4px;
+    background:linear-gradient(135deg, var(--amber), #B9721E);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-sans);font-weight:700;font-size:14px;color:var(--ink);
+    flex-shrink:0;
+  }
+  nav.main-nav{display:flex;align-items:center;gap:4px;}
+  .nav-link{
+    background:none;border:none;color:#C9D3E0;font-size:14.5px;font-weight:500;
+    padding:10px 14px;border-radius:5px;transition:background .15s, color .15s;
+    display:flex;align-items:center;gap:6px;position:relative;
+  }
+  .nav-link:hover{background:rgba(255,255,255,0.08);color:#fff;}
+  .nav-link.active{color:#fff;}
+  .nav-link.active::after{
+    content:"";position:absolute;left:14px;right:14px;bottom:0;height:2px;background:#fff;
+  }
+  .nav-link:disabled{color:#AEB9CB;cursor:default;background:none;}
+  .nav-link:disabled:hover{background:none;color:#AEB9CB;}
+  .nav-link:disabled.active{color:#fff;}
+  .nav-link .chevron{margin-top:1px;opacity:.8;}
+  .header-right{display:flex;align-items:center;gap:10px;}
+  .icon-btn{
+    width:36px;height:36px;border-radius:50%;background:none;border:none;color:#DCE3EC;
+    display:flex;align-items:center;justify-content:center;position:relative;cursor:default;
+  }
+  .icon-btn .notif-dot{
+    position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:50%;background:#D9503F;
+    border:1.5px solid var(--ink);
+  }
+  .avatar-menu-wrap{position:relative;}
+  .avatar-trigger{
+    width:34px;height:34px;border-radius:50%;background:var(--slate);border:none;color:#fff;
+    font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  }
+  .avatar-trigger:hover{background:var(--slate-dark);}
+  .avatar-dropdown{
+    position:absolute;top:calc(100% + 10px);right:0;background:#fff;border:1px solid var(--border);
+    border-radius:8px;box-shadow:0 8px 24px rgba(16,24,40,0.18);min-width:180px;padding:6px;
+    display:none;z-index:60;
+  }
+  .avatar-dropdown.open{display:block;}
+  .avatar-dropdown-item{
+    display:block;width:100%;text-align:left;background:none;border:none;padding:10px 12px;
+    font-size:14px;font-weight:500;color:#2A3342;border-radius:5px;
+  }
+  .avatar-dropdown-item:hover{background:var(--sand);}
+  .avatar-dropdown-item.danger{color:var(--danger);}
+
+  .staff-badge{
+    display:none;font-family:var(--font-serif);font-size:16px;font-weight:600;color:#EDE0D8;
+    letter-spacing:.2px;
+  }
+  .app-header.staff-mode nav.main-nav{display:none;}
+  .app-header.staff-mode .staff-badge{display:inline-block;}
+  .staff-toggle{
+    display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;font-weight:600;
+    color:#C9D3E0;user-select:none;
+  }
+  .staff-toggle input{display:none;}
+  .staff-toggle-track{
+    width:34px;height:18px;border-radius:20px;background:rgba(255,255,255,0.22);position:relative;
+    transition:background .15s;flex-shrink:0;
+  }
+  .staff-toggle-thumb{
+    position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;
+    transition:left .15s;
+  }
+  .staff-toggle input:checked + .staff-toggle-track{background:var(--amber);}
+  .staff-toggle input:checked + .staff-toggle-track .staff-toggle-thumb{left:18px;}
+
+  .mini-toggle{display:inline-flex;align-items:center;cursor:pointer;}
+  .mini-toggle input{display:none;}
+  .mini-toggle-track{
+    width:36px;height:20px;border-radius:20px;background:#D9DCE2;position:relative;
+    transition:background .15s;flex-shrink:0;
+  }
+  .mini-toggle-thumb{
+    position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;
+    transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,0.2);
+  }
+  .mini-toggle input:checked + .mini-toggle-track{background:var(--success);}
+  .mini-toggle input:checked + .mini-toggle-track .mini-toggle-thumb{left:18px;}
+
+  .admin-row{
+    display:flex;align-items:center;gap:18px;background:#fff;border:1px solid var(--border);
+    border-radius:8px;padding:16px 18px;margin-bottom:10px;transition:box-shadow .15s, border-color .15s;
+  }
+  .admin-row.dragging{opacity:.4;}
+  .admin-row.drag-over{border-color:var(--slate);box-shadow:0 0 0 2px rgba(47,93,138,0.15);}
+  .drag-handle{
+    color:#B9C0CC;cursor:grab;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    padding:4px;
+  }
+  .drag-handle:active{cursor:grabbing;}
+  .admin-row-main{flex:1;min-width:0;}
+  .admin-row-name{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+  .admin-row-meta{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;}
+  .badge-type{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
+  .badge-type.global{background:var(--neutral-bg);color:var(--slate-dark);}
+  .badge-type.conditional{background:var(--warn-bg);color:var(--warn);}
+  .admin-row-trigger{font-size:12px;color:#8A94A6;}
+  .admin-row-message{font-size:13.5px;color:#5B6472;margin:0;line-height:1.5;}
+  .admin-row-toggle-label{font-size:12px;color:#8A94A6;margin-left:8px;}
+
+  .system-banner{
+    display:none;background:var(--danger);color:#fff;text-align:center;font-size:13.5px;
+    font-weight:700;line-height:1.4;
+  }
+  .system-banner.visible{display:block;}
+  .system-banner-row{padding:11px 24px;}
+  .system-banner-row + .system-banner-row{border-top:1px solid rgba(255,255,255,0.25);}
+
+  main{flex:1;display:flex;flex-direction:column;}
+
+  .screen{display:none;flex:1;}
+  .screen.active{display:flex;flex-direction:column;}
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    font-size:15px;font-weight:600;padding:12px 22px;border-radius:5px;border:none;
+    transition:background .15s, box-shadow .15s, transform .05s;
+    line-height:1.2;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:var(--slate);color:#fff;}
+  .btn-primary:hover{background:var(--slate-dark);}
+  .btn-primary:disabled{background:#AFC0D1;cursor:not-allowed;}
+  .btn-secondary{background:transparent;color:var(--slate);border:1.5px solid var(--slate);}
+  .btn-secondary:hover{background:#EEF3F8;}
+  .btn-text{background:transparent;color:var(--slate);padding:8px 6px;font-weight:600;}
+  .btn-text:hover{text-decoration:underline;}
+  .btn-danger-text{background:transparent;color:var(--danger);padding:8px 6px;font-weight:600;}
+  .btn-full{width:100%;}
+  .btn-sm{padding:8px 14px;font-size:13.5px;}
+  .btn-outline-invert{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,0.55);}
+  .btn-outline-invert:hover{background:rgba(255,255,255,0.1);}
+  .btn-invert{background:#fff;color:var(--ink);}
+  .btn-invert:hover{background:#EDEFF3;}
+  .btn-invert:disabled{background:rgba(255,255,255,0.55);color:var(--ink);cursor:default;}
+
+  /* ---------- Public page shell (registration) ---------- */
+  .public-page{min-height:100vh;background:var(--sand);}
+  .public-header{
+    background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:space-between;
+    padding:0 28px;height:60px;
+  }
+  .public-header-actions{display:flex;align-items:center;gap:10px;}
+  .public-page-body{max-width:820px;margin:0 auto;padding:40px 24px 64px;}
+  .reg-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:40px 44px 36px;box-shadow:var(--shadow-card);}
+  .reg-card h1{font-family:var(--font-serif);font-size:30px;margin:0 0 6px;font-weight:600;}
+  .reg-card .lede{font-size:14.5px;color:#5B6472;margin:0 0 8px;}
+  .reg-section-title{
+    font-size:15px;font-weight:700;color:var(--ink);margin:30px 0 16px;padding-bottom:8px;
+    border-bottom:1px solid var(--border);
+  }
+  .reg-card form > .reg-section-title:first-child{margin-top:22px;}
+  .field-row.three{display:flex;gap:14px;}
+  .field-row.three .field{flex:1;}
+  .age-display{
+    padding:11px 13px;border:1.5px solid var(--border);border-radius:5px;background:var(--sand);
+    color:#5B6472;font-size:15px;font-weight:600;
+  }
+  .reg-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:30px;}
+
+  /* ---------- Login (scenic background) ---------- */
+  .login-scenic{
+    position:relative;min-height:100vh;overflow:hidden;
+    background:linear-gradient(to bottom, #eef6f8 0%, #cfe3ea 30%, #9fc3d6 55%, #6f9db8 80%, #4a7a99 100%);
+    display:flex;flex-direction:column;align-items:center;padding:50px 20px 40px;
+  }
+  .login-mountain{position:absolute;left:0;right:0;bottom:0;}
+  .login-mountain.layer1{height:42%;background:#8fb2c9;opacity:.5;
+    clip-path:polygon(0 55%, 10% 35%, 22% 50%, 38% 25%, 52% 48%, 68% 22%, 82% 42%, 100% 30%, 100% 100%, 0 100%);}
+  .login-mountain.layer2{height:32%;background:#6a93ac;opacity:.7;
+    clip-path:polygon(0 68%, 14% 42%, 30% 58%, 48% 32%, 64% 55%, 80% 28%, 100% 48%, 100% 100%, 0 100%);}
+  .login-mountain.layer3{height:24%;background:#436c86;
+    clip-path:polygon(0 80%, 18% 52%, 34% 66%, 54% 42%, 74% 60%, 90% 45%, 100% 58%, 100% 100%, 0 100%);}
+  .login-treeline{
+    position:absolute;bottom:0;left:0;right:0;height:80px;
+    background:linear-gradient(135deg, transparent 50%, #14303c 50%), linear-gradient(225deg, transparent 50%, #14303c 50%);
+    background-size:36px 80px;background-position:0 0, 18px 0;background-repeat:repeat-x;
+  }
+  .back-home-pill{
+    position:relative;z-index:5;background:var(--ink);color:#fff;border:none;border-radius:24px;
+    padding:10px 20px;font-size:13.5px;font-weight:700;margin-bottom:26px;display:flex;align-items:center;gap:6px;
+  }
+  .back-home-pill:hover{background:var(--slate-dark);}
+  .login-content{position:relative;z-index:4;width:100%;max-width:440px;display:flex;flex-direction:column;align-items:center;gap:18px;}
+  .login-card{width:100%;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 18px 44px rgba(10,25,40,0.28);}
+  .login-card-body{padding:34px 34px 26px;}
+  .login-card h1{font-family:var(--font-serif);font-size:26px;font-weight:700;margin:0 0 4px;color:var(--ink);}
+  .login-sub{font-size:14.5px;color:#5B6472;margin:0 0 22px;}
+  .login-links{margin-top:18px;text-align:center;}
+  .login-forgot{font-size:13.5px;}
+  .login-links-row{margin-top:8px;font-size:13.5px;}
+  .login-links-sep{margin:0 8px;color:#B9C0CC;}
+  .login-footer-dark{background:var(--ink);color:#C9D3E0;text-align:center;padding:18px 20px 20px;font-size:12px;}
+  .login-footer-label{margin-bottom:6px;}
+  .login-footer-brand{
+    display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-serif);
+    font-size:16px;font-weight:700;color:#fff;margin-bottom:8px;
+  }
+  .login-copyright{color:#8FA0B8;font-size:11px;}
+  .login-demo-box{width:100%;background:rgba(255,255,255,0.94);border-radius:8px;padding:16px;box-shadow:0 6px 20px rgba(10,25,40,0.18);margin-bottom:0;}
+  .pw-eye-toggle{
+    position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;
+    color:#8A94A6;padding:4px;display:flex;
+  }
+  .pw-eye-toggle:hover{color:var(--slate);}
+  .a11y-fab{
+    position:fixed;left:20px;bottom:20px;width:44px;height:44px;border-radius:50%;background:var(--ink);
+    color:#fff;border:none;display:flex;align-items:center;justify-content:center;z-index:6;
+    box-shadow:0 4px 14px rgba(0,0,0,0.25);
+  }
+  .a11y-fab:hover{background:var(--slate-dark);}
+
+  /* ---------- Auth layout (mini-reg / login / success) ---------- */
+  .auth-shell{display:flex;min-height:100vh;width:100%;}
+  .auth-side{
+    flex:0 0 38%;
+    background:var(--ink);
+    color:#fff;
+    padding:56px 48px;
+    display:flex;flex-direction:column;justify-content:space-between;
+    position:relative;overflow:hidden;
+  }
+  .auth-side::after{
+    content:"";position:absolute;right:-90px;bottom:-90px;width:280px;height:280px;
+    border-radius:50%;border:1px solid rgba(255,255,255,0.08);
+  }
+  .auth-side::before{
+    content:"";position:absolute;right:-40px;bottom:-160px;width:280px;height:280px;
+    border-radius:50%;border:1px solid rgba(255,255,255,0.06);
+  }
+  .auth-side .brand{font-size:22px;}
+  .auth-headline{font-family:var(--font-serif);font-size:34px;line-height:1.25;font-weight:600;max-width:360px;position:relative;z-index:1;}
+  .auth-sub{font-size:15px;color:#B9C6D8;margin-top:14px;max-width:320px;line-height:1.55;position:relative;z-index:1;}
+  .auth-foot{font-size:12.5px;color:#8FA0B8;position:relative;z-index:1;}
+
+  .auth-main{
+    flex:1;display:flex;align-items:center;justify-content:center;
+    padding:40px 24px;background:var(--sand);
+  }
+  .auth-card{
+    width:100%;max-width:460px;background:#fff;border:1px solid var(--border);
+    border-radius:8px;padding:40px 40px 36px;box-shadow:var(--shadow-card);
+  }
+  .auth-card.wide{max-width:560px;}
+  .auth-card h1{font-family:var(--font-serif);font-size:26px;margin:0 0 6px;font-weight:600;}
+  .auth-card .lede{font-size:14.5px;color:#5B6472;margin:0 0 28px;line-height:1.5;}
+
+  /* ---------- Form elements ---------- */
+  .field{margin-bottom:18px;}
+  .field-row{display:flex;gap:14px;}
+  .field-row .field{flex:1;}
+  label.f-label{
+    display:flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;color:#2A3342;
+    margin-bottom:6px;
+  }
+  .req{color:var(--danger);}
+  .tooltip-wrap{position:relative;display:inline-flex;}
+  .info-dot{
+    width:16px;height:16px;border-radius:50%;background:var(--neutral-bg);color:#5B6472;
+    font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;
+    cursor:help;
+  }
+  .tooltip-bubble{
+    display:none;position:absolute;left:22px;top:-6px;width:230px;background:var(--ink);color:#fff;
+    font-size:12.5px;font-weight:400;line-height:1.45;padding:10px 12px;border-radius:6px;z-index:20;
+  }
+  .tooltip-wrap:hover .tooltip-bubble{display:block;}
+
+  input[type=text], input[type=email], input[type=password], input[type=date], select{
+    width:100%;padding:11px 13px;border:1.5px solid var(--border-strong);border-radius:5px;
+    font-size:15px;font-family:inherit;color:var(--ink);background:#fff;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  input:focus, select:focus{border-color:var(--slate);box-shadow:0 0 0 3px rgba(47,93,138,0.13);outline:none;}
+  input.error{border-color:var(--danger);}
+  input.success-input{border-color:var(--success);}
+  .field-hint{font-size:12.5px;color:#707A8A;margin-top:5px;}
+  .condition-sentence{
+    display:flex;align-items:center;gap:8px;padding:11px 13px;border:1.5px solid var(--border);
+    border-radius:5px;background:var(--sand);color:#3A4453;font-size:14.5px;flex-wrap:wrap;
+  }
+  .condition-sentence input, .condition-sentence select{
+    width:auto;min-width:70px;padding:6px 8px;font-size:14.5px;font-weight:600;
+  }
+  .field-error{font-size:12.5px;color:var(--danger);margin-top:5px;display:none;font-weight:500;}
+  .field-error.show{display:block;}
+  .pw-wrap{position:relative;}
+  .pw-toggle{
+    position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;
+    font-size:12.5px;font-weight:600;color:var(--slate);padding:4px;
+  }
+  .pw-checklist{list-style:none;padding:0;margin:9px 0 0;font-size:12.5px;color:#707A8A;}
+  .pw-checklist li{display:flex;align-items:center;gap:7px;padding:2px 0;}
+  .pw-checklist .dot{width:14px;height:14px;border-radius:50%;border:1.5px solid #C7CDD6;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:9px;color:transparent;}
+  .pw-checklist li.met .dot{background:var(--success);border-color:var(--success);color:#fff;}
+  .pw-checklist li.met{color:var(--success);}
+
+  .ssn-note{
+    display:flex;gap:10px;background:var(--neutral-bg);border:1px solid var(--border);border-radius:6px;
+    padding:11px 13px;font-size:12.5px;color:#4B5563;line-height:1.5;margin-top:8px;
+  }
+  .ssn-note svg{flex-shrink:0;margin-top:1px;}
+
+  .radio-group{display:flex;flex-direction:column;gap:8px;}
+  .radio-option{
+    display:flex;align-items:flex-start;gap:10px;border:1.5px solid var(--border-strong);
+    border-radius:6px;padding:11px 13px;font-size:14px;transition:border-color .15s, background .15s;
+  }
+  .radio-option:hover{border-color:var(--slate);}
+  .radio-option input{margin-top:2px;width:16px;height:16px;accent-color:var(--slate);flex-shrink:0;}
+  .radio-option .radio-copy strong{display:block;font-size:14px;font-weight:600;}
+  .radio-option .radio-copy span{font-size:12.5px;color:#707A8A;}
+
+  fieldset{border:none;padding:0;margin:0;}
+  legend{padding:0;margin-bottom:8px;}
+
+  .divider-row{display:flex;align-items:center;gap:12px;margin:22px 0;}
+  .divider-row .line{flex:1;height:1px;background:var(--border);}
+  .divider-row span{font-size:12.5px;color:#8A94A6;}
+
+  .foot-link-row{margin-top:22px;text-align:center;font-size:14px;color:#5B6472;}
+
+  .demo-box{
+    margin-top:26px;padding:14px 16px;background:var(--sand);border:1px dashed var(--border-strong);
+    border-radius:7px;
+  }
+  .demo-box p{margin:0 0 10px;font-size:12.5px;color:#707A8A;font-weight:600;text-align:center;}
+  .demo-box-actions{display:flex;gap:8px;}
+  .demo-box-actions .btn{flex:1;font-size:12px;line-height:1.3;padding:9px 8px;white-space:normal;}
+
+  /* ---------- Success screen ---------- */
+  .success-icon{
+    width:56px;height:56px;border-radius:50%;background:var(--success-bg);color:var(--success);
+    display:flex;align-items:center;justify-content:center;margin-bottom:20px;
+  }
+
+  /* ---------- Job Search screen ---------- */
+  .page-wrap{max-width:1180px;margin:0 auto;padding:28px 28px 60px;width:100%;}
+  .page-title{font-family:var(--font-serif);font-size:28px;font-weight:600;margin:0 0 4px;}
+  .page-sub{font-size:14.5px;color:#5B6472;margin:0 0 22px;}
+
+  .continue-banner{
+    display:flex;align-items:center;gap:16px;background:#fff;border:1px solid var(--border);
+    border-left:4px solid var(--amber);border-radius:8px;padding:16px 18px;margin-bottom:22px;
+    box-shadow:var(--shadow-card);
+  }
+  .continue-banner-icon{
+    width:38px;height:38px;border-radius:50%;background:var(--warn-bg);color:var(--warn);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .continue-banner-body{flex:1;min-width:0;}
+  .continue-banner-body strong{display:block;font-size:14.5px;font-weight:700;color:var(--ink);margin-bottom:8px;}
+  .continue-banner-body .continue-banner-desc{margin:0;font-size:13.5px;color:#5B6472;line-height:1.5;}
+  .continue-banner-progress{display:flex;align-items:center;gap:10px;max-width:320px;}
+  .continue-banner-progress .bar-track{flex:1;height:7px;background:var(--neutral-bg);border-radius:20px;overflow:hidden;}
+  .continue-banner-progress .bar-fill{height:100%;background:var(--amber);border-radius:20px;transition:width .5s ease;}
+  .continue-banner-progress .pct{font-size:12.5px;font-weight:700;color:var(--ink);flex-shrink:0;}
+  .continue-banner-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+  .appt-banner{border-left-color:var(--slate);}
+  .appt-icon{background:#E9EEF4;color:var(--slate-dark);}
+
+  .home-banners-overlay{
+    position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:1180px;
+    padding:20px 28px 0;z-index:40;display:flex;flex-direction:column;gap:10px;
+  }
+  .home-hero{background:var(--sand);padding:8px 28px 44px;}  .home-hero-inner{max-width:900px;margin:0 auto;text-align:center;}
+  .home-hero-logo{
+    display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--font-serif);
+    font-size:26px;font-weight:600;color:var(--ink);margin-bottom:34px;
+  }
+  .home-search-card{
+    background:#fff;border-radius:44px;box-shadow:0 4px 22px rgba(16,36,62,0.09);
+    padding:22px 40px;display:flex;align-items:center;gap:28px;text-align:left;flex-wrap:wrap;
+    justify-content:center;
+  }
+  .home-search-illustration{
+    width:76px;height:76px;border-radius:50%;background:var(--sand);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .home-search-form h2{font-size:13px;letter-spacing:.4px;font-weight:700;color:#3A4453;margin:0 0 12px;}
+  .home-search-inputs{display:flex;gap:10px;flex-wrap:wrap;}
+  .home-search-inputs input{width:220px;}
+  .home-search-inputs input:disabled{background:#F2F3F5;color:#9AA3B0;cursor:default;}
+  .home-search-inputs .btn:disabled{background:#AFC0D1;cursor:default;}
+
+  .home-lower{background:var(--rose);padding:36px 28px 56px;}
+  .home-lower-inner{max-width:1180px;margin:0 auto;display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap;}
+  .home-panel{
+    flex:1;min-width:300px;background:#fff;border-radius:8px;padding:24px 26px;
+    box-shadow:var(--shadow-card);
+  }
+  .home-panel h3{font-family:var(--font-serif);font-size:17px;font-weight:600;margin:0 0 18px;color:var(--ink);}
+  .ondemand-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px 24px;}
+  .ondemand-item{
+    background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:10px;
+    padding:14px 8px;text-align:center;font-size:13.5px;font-weight:600;color:#3A4453;border-radius:8px;
+  }
+  .ondemand-item:not(.disabled):hover{background:var(--sand);}
+  .ondemand-item.disabled{color:#9AA3B0;cursor:default;}
+  .ondemand-icon{
+    width:52px;height:52px;border-radius:50%;background:var(--neutral-bg);color:var(--slate-dark);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .ondemand-item.disabled .ondemand-icon{color:#AEB6C2;}
+  .news-list{max-height:300px;overflow-y:auto;padding-right:6px;}
+  .news-item{padding:12px 0;border-bottom:1px solid var(--border);}
+  .news-item:last-child{border-bottom:none;}
+  .news-item strong{display:block;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:3px;}
+  .news-item span{font-size:13px;color:#5B6472;line-height:1.55;}
+
+  .search-bar{
+    display:flex;gap:10px;background:#fff;border:1px solid var(--border);border-radius:8px;
+    padding:14px;margin-bottom:22px;box-shadow:var(--shadow-card);flex-wrap:wrap;
+  }
+  .search-bar input{flex:2;min-width:220px;}
+  .search-bar input.zip{flex:1;min-width:140px;}
+  .search-bar .btn{flex-shrink:0;}
+
+  .search-layout{display:flex;gap:24px;align-items:flex-start;}
+  .filters-panel{
+    width:230px;flex-shrink:0;background:#fff;border:1px solid var(--border);border-radius:8px;
+    padding:20px;position:sticky;top:20px;
+  }
+  .filters-panel h3{font-size:13.5px;text-transform:none;margin:0 0 14px;font-weight:700;color:#2A3342;}
+  .filter-group{margin-bottom:20px;}
+  .filter-group h4{font-size:13px;font-weight:600;margin:0 0 9px;color:#3A4453;}
+  .filter-check{display:flex;align-items:center;gap:8px;font-size:13.5px;color:#4B5563;padding:5px 0;}
+  .filter-check input{accent-color:var(--slate);width:15px;height:15px;}
+
+  .results-col{flex:1;min-width:0;}
+  .results-meta{font-size:13.5px;color:#5B6472;margin-bottom:14px;}
+
+  .job-card{
+    background:#fff;border:1px solid var(--border);border-radius:8px;padding:20px 22px;
+    margin-bottom:14px;transition:border-color .15s, box-shadow .15s;cursor:pointer;
+  }
+  .job-card:hover{border-color:var(--slate);box-shadow:0 2px 8px rgba(16,36,62,0.07);}
+  .job-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;}
+  .job-title{font-size:17px;font-weight:700;margin:0 0 4px;color:var(--ink);}
+  .job-employer{font-size:14.5px;color:var(--slate-dark);font-weight:500;margin:0 0 8px;}
+  .job-meta-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+  .job-tag{
+    font-size:12px;font-weight:600;padding:4px 9px;border-radius:20px;background:var(--neutral-bg);
+    color:#4B5563;
+  }
+  .job-desc{font-size:13.5px;color:#5B6472;line-height:1.55;margin:0;}
+  .save-btn{
+    background:none;border:1.5px solid var(--border-strong);border-radius:5px;width:38px;height:38px;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#8A94A6;
+    transition:border-color .15s, color .15s, background .15s;
+  }
+  .save-btn:hover{border-color:var(--slate);color:var(--slate);}
+  .save-btn.saved{background:var(--slate);border-color:var(--slate);color:#fff;}
+
+  /* ---------- Job details screen ---------- */
+  .back-link{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;color:var(--slate);
+    background:none;border:none;margin-bottom:18px;padding:4px 0;}
+  .job-detail-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:32px;max-width:760px;}
+  .job-detail-card h1{font-family:var(--font-serif);font-size:26px;margin:0 0 6px;}
+  .job-detail-card .job-employer{font-size:16px;}
+  .job-detail-actions{display:flex;gap:12px;margin:22px 0 26px;}
+  .job-detail-section{margin-bottom:22px;}
+  .job-detail-section h3{font-size:14px;font-weight:700;margin:0 0 8px;color:#2A3342;}
+  .job-detail-section p, .job-detail-section li{font-size:14.5px;color:#3A4453;line-height:1.65;}
+  .job-detail-section ul{margin:0;padding-left:20px;}
+
+  /* ---------- Profile screen ---------- */
+  .profile-header{
+    background:#fff;border:1px solid var(--border);border-radius:8px;padding:26px 28px;margin-bottom:22px;
+    display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;
+  }
+  .profile-header-left h1{font-family:var(--font-serif);font-size:24px;margin:0 0 6px;font-weight:600;}
+  .profile-header-left p{font-size:14px;color:#5B6472;margin:0;max-width:440px;line-height:1.5;}
+
+  .profile-layout{display:flex;gap:24px;align-items:flex-start;}
+  .profile-sidebar{
+    width:280px;flex-shrink:0;background:#fff;border:1px solid var(--border);border-radius:8px;
+    padding:26px 22px;display:flex;flex-direction:column;align-items:center;text-align:center;
+  }
+  .profile-avatar-lg{
+    width:88px;height:88px;border-radius:50%;background:var(--ink);color:#fff;font-size:28px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;margin-bottom:14px;flex-shrink:0;
+  }
+  .profile-name{font-family:var(--font-serif);font-size:19px;font-weight:600;margin:0 0 10px;color:var(--ink);}
+  .profile-meta-row{font-size:13px;color:#5B6472;margin-bottom:4px;}
+  .profile-meta-row strong{color:var(--ink);font-weight:700;}
+  .profile-status{
+    display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--success);
+    margin:8px 0 18px;
+  }
+  .profile-status .status-dot{width:7px;height:7px;border-radius:50%;background:var(--success);}
+  .profile-contact-list{
+    list-style:none;margin:0 0 18px;padding:16px 0 0;width:100%;border-top:1px solid var(--border);
+    text-align:left;
+  }
+  .profile-contact-list li{
+    display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:#4B5563;padding:6px 0;line-height:1.5;
+  }
+  .profile-contact-list svg{flex-shrink:0;margin-top:1px;color:#8A94A6;}
+  .profile-registration{
+    width:100%;text-align:left;font-size:12px;color:#8A94A6;line-height:1.6;padding-top:14px;
+    border-top:1px solid var(--border);margin-bottom:14px;
+  }
+
+  .profile-main{flex:1;min-width:0;}
+  .profile-tabs{
+    display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:22px;flex-wrap:wrap;
+  }
+  .profile-tab{
+    background:none;border:none;padding:12px 6px;margin-right:20px;font-size:14px;font-weight:600;
+    color:#8A94A6;position:relative;cursor:default;
+  }
+  .profile-tab.active{color:var(--slate-dark);}
+  .profile-tab.active::after{
+    content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--slate-dark);
+  }
+  .progress-block{display:flex;align-items:center;gap:16px;}
+  .progress-ring-wrap{position:relative;width:76px;height:76px;flex-shrink:0;}
+  .progress-ring-wrap svg{transform:rotate(-90deg);}
+  .progress-ring-bg{fill:none;stroke:var(--neutral-bg);stroke-width:8;}
+  .progress-ring-fg{fill:none;stroke:var(--amber);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .5s ease;}
+  .progress-ring-label{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:16px;font-weight:700;color:var(--ink);
+  }
+  .progress-caption{font-size:13px;color:#5B6472;max-width:150px;line-height:1.4;}
+  .progress-caption strong{color:var(--ink);display:block;font-size:14px;margin-bottom:2px;}
+
+  .tiles-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));gap:16px;}
+  .tile-v2{
+    position:relative;background:#fff;border:1px solid var(--border);border-radius:8px;padding:28px 20px 24px;
+    display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;cursor:pointer;
+    transition:box-shadow .15s, border-color .15s;
+  }
+  .tile-v2:hover{box-shadow:0 2px 10px rgba(16,36,62,0.08);border-color:var(--border-strong);}
+  .tile-v2.needs-attention{background:var(--danger-bg);border-color:#F0C4B8;}
+  .tile-v2.in-progress{background:var(--warn-bg);border-color:#EAD6A8;}
+  .tile-avatar{
+    width:64px;height:64px;border-radius:50%;background:var(--neutral-bg);color:#8A94A6;
+    display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;flex-shrink:0;
+  }
+  .tile-v2 h3{font-size:15px;font-weight:700;margin:0;color:var(--ink);line-height:1.35;}
+  .tile-pct{font-size:14px;font-weight:600;}
+  .tile-pct.pct-complete{color:var(--success);}
+  .tile-pct.pct-partial{color:var(--warn);}
+  .tile-pct.pct-none{color:#9AA3B0;}
+
+  .profile-note{
+    display:flex;align-items:center;gap:14px;border-radius:8px;padding:16px 18px;margin-bottom:20px;
+    border-left:4px solid var(--slate);background:var(--slate-bg);
+  }
+  .profile-note.complete{border-left-color:var(--success);background:var(--success-bg);}
+  .profile-note-icon{
+    width:38px;height:38px;border-radius:50%;background:#fff;display:flex;align-items:center;
+    justify-content:center;color:var(--slate);flex-shrink:0;
+  }
+  .profile-note.complete .profile-note-icon{color:var(--success);}
+  .profile-note-text{flex:1;min-width:0;}
+  .profile-note-text strong{display:block;font-size:14.5px;color:var(--ink);margin-bottom:2px;}
+  .profile-note-text span{font-size:13px;color:#5B6472;line-height:1.5;}
+  .profile-note.oneline{padding:11px 16px;margin-bottom:18px;gap:10px;}
+  .profile-note.oneline .profile-note-icon{width:26px;height:26px;}
+  .profile-note.oneline span{font-size:13.5px;font-weight:600;color:var(--ink);}
+
+  .tile{
+    background:#fff;border:1px solid var(--border);border-left:4px solid var(--neutral);border-radius:7px;
+    padding:20px 20px 18px;display:flex;flex-direction:column;gap:10px;transition:box-shadow .15s;
+  }
+  .tile:hover{box-shadow:0 2px 10px rgba(16,36,62,0.07);}
+  .tile.status-complete{border-left-color:var(--success);}
+  .tile.status-partial{border-left-color:var(--warn);}
+  .tile.status-not-started{border-left-color:var(--neutral);}
+  .tile-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .tile-top h3{font-size:16px;font-weight:700;margin:0;color:var(--ink);}
+  .status-pill{
+    font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;
+    text-transform:none;letter-spacing:0.2px;
+  }
+  .status-pill.status-complete{background:var(--success-bg);color:var(--success);}
+  .status-pill.status-partial{background:var(--warn-bg);color:var(--warn);}
+  .status-pill.status-not-started{background:var(--neutral-bg);color:#5B6472;}
+  .tile-body{font-size:13.5px;color:#5B6472;line-height:1.55;flex:1;margin:0;}
+  .tile-fields{list-style:none;margin:0;padding:0;font-size:13px;color:#5B6472;}
+  .tile-fields li{padding:2px 0;}
+  .tile-cta{align-self:flex-start;margin-top:4px;}
+
+  /* ---------- Modal / drawer ---------- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(16,24,40,0.5);display:none;align-items:stretch;
+    justify-content:flex-end;z-index:100;
+  }
+  .overlay.active{display:flex;}
+  .overlay.center{align-items:center;justify-content:center;}
+  .drawer{
+    background:#fff;width:100%;max-width:480px;height:100%;overflow-y:auto;
+    box-shadow:-6px 0 24px rgba(0,0,0,0.15);display:flex;flex-direction:column;
+    animation:slideIn .22s ease;
+  }
+  @keyframes slideIn{from{transform:translateX(30px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+  .modal-box{
+    background:#fff;width:100%;max-width:440px;border-radius:10px;padding:32px;
+    box-shadow:0 12px 40px rgba(16,24,40,0.25);animation:popIn .18s ease;
+  }
+  @keyframes popIn{from{transform:scale(.97);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .drawer-header{
+    display:flex;justify-content:space-between;align-items:center;padding:20px 24px;
+    border-bottom:1px solid var(--border);flex-shrink:0;
+  }
+  .drawer-header h2{font-family:var(--font-serif);font-size:20px;margin:0;font-weight:600;}
+  .drawer-close{background:none;border:none;font-size:22px;line-height:1;color:#8A94A6;padding:4px;}
+  .drawer-close:hover{color:var(--ink);}
+  .drawer-body{padding:24px;flex:1;}
+  .drawer-footer{
+    padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;
+    flex-shrink:0;
+  }
+  .save-toast{
+    position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;padding:13px 22px;border-radius:7px;font-size:14px;font-weight:500;
+    display:flex;align-items:center;gap:10px;opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;
+    z-index:200;
+  }
+  .save-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .save-toast .dot-ok{width:18px;height:18px;border-radius:50%;background:var(--success);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+  /* ---------- First login / contextual prompts ---------- */
+  .prompt-modal{max-width:420px;text-align:left;}
+  .prompt-modal .success-icon{margin-bottom:16px;}
+  .prompt-modal h2{font-family:var(--font-serif);font-size:22px;margin:0 0 8px;}
+  .prompt-modal p{font-size:14.5px;color:#5B6472;line-height:1.6;margin:0 0 18px;}
+  .prompt-progress{display:flex;align-items:center;gap:12px;background:var(--sand);border-radius:7px;
+    padding:12px 14px;margin-bottom:22px;}
+  .prompt-progress .bar-track{flex:1;height:8px;background:var(--neutral-bg);border-radius:20px;overflow:hidden;}
+  .prompt-progress .bar-fill{height:100%;background:var(--amber);border-radius:20px;transition:width .5s ease;}
+  .prompt-progress .pct{font-size:13.5px;font-weight:700;color:var(--ink);flex-shrink:0;}
+  .prompt-actions{display:flex;flex-direction:column;gap:10px;}
+  .prompt-actions.row{flex-direction:row;}
+
+  .missing-list{list-style:none;margin:0 0 20px;padding:0;}
+  .missing-list li{
+    display:flex;align-items:center;gap:9px;font-size:14px;color:#3A4453;padding:8px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .missing-list li:last-child{border-bottom:none;}
+  .missing-list li .req-dot{width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0;}
+
+  /* ---------- Empty state ---------- */
+  .empty-state{
+    text-align:center;padding:70px 20px;color:#8A94A6;
+  }
+  .empty-state svg{margin-bottom:14px;}
+  .empty-state p{font-size:14.5px;max-width:320px;margin:0 auto;}
+
+  /* ---------- Notes fab ---------- */
+  .notes-fab{
+    position:fixed;bottom:22px;right:22px;background:var(--ink);color:#fff;border:none;
+    border-radius:30px;padding:12px 18px;font-size:13.5px;font-weight:600;display:flex;align-items:center;
+    gap:8px;box-shadow:0 4px 14px rgba(16,36,62,0.3);z-index:80;
+  }
+  .notes-fab:hover{background:var(--slate-dark);}
+
+  .breadcrumb-flow{
+    display:flex;align-items:center;gap:8px;font-size:12.5px;color:#8A94A6;margin-bottom:14px;flex-wrap:wrap;
+  }
+  .breadcrumb-flow b{color:var(--slate-dark);}
+
+  .checklist-note{font-size:12.5px;color:#5B6472;background:var(--sand);border:1px solid var(--border);
+    border-radius:6px;padding:10px 12px;margin-top:16px;line-height:1.5;}
+
+  @media (max-width: 860px){
+    .auth-side{display:none;}
+    .search-layout{flex-direction:column;}
+    .filters-panel{width:100%;position:static;}
+    .profile-header{flex-direction:column;align-items:flex-start;}
+    .profile-layout{flex-direction:column;}
+    .profile-sidebar{width:100%;}
+    .field-row.three{flex-direction:column;}
+    .reg-card{padding:28px 22px 26px;}
+  }
+
+  /* ---------- Guided tour overlay ---------- */
+  .dim-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);opacity:0;pointer-events:none;transition:opacity .25s;z-index:200;}
+  .dim-overlay.active{opacity:1;pointer-events:auto;}
+  .spotlight{position:relative;z-index:201;box-shadow:0 0 0 6px rgba(217,142,43,0.6);border-radius:6px;}
+  .tour-tooltip{
+    position:fixed;z-index:202;background:#fff;border-radius:10px;padding:16px 18px;width:260px;
+    box-shadow:0 12px 32px rgba(0,0,0,0.35);text-align:left;display:none;
+  }
+  .tour-tooltip.show{display:block;}
+  .tour-tooltip h3{font-family:var(--font-serif);font-size:15px;font-weight:600;color:var(--ink);margin:0 0 5px;}
+  .tour-tooltip p{font-size:13px;color:#5B6472;margin:0 0 14px;line-height:1.5;}
+  .tour-tooltip .row{display:flex;align-items:center;justify-content:space-between;}
+  .tour-tooltip .step-count{font-size:11.5px;color:#9AA3B0;font-weight:600;}
+  .tour-tooltip .actions{display:flex;gap:8px;}
+  .tour-tooltip .actions button{border:none;border-radius:6px;font-size:12.5px;font-weight:700;padding:6px 13px;font-family:inherit;cursor:pointer;}
+  .tour-btn-skip{background:none;color:#9AA3B0;padding:6px 4px !important;}
+  .tour-btn-skip:hover{color:var(--ink);}
+  .tour-btn-next{background:var(--slate);color:#fff;}
+  .tour-btn-next:hover{background:var(--slate-dark);}
+
+  /* ---------- Demo control panel ---------- */
+  .demo-tour-panel{background:#fff;border-top:2px dashed var(--border-strong);padding:20px 28px 28px;}
+  .demo-tour-panel h4{font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:#9AA3B0;margin:0 0 12px;}
+  .demo-tour-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13.5px;max-width:520px;}
+  .demo-tour-row:last-child{border-bottom:none;}
+  .demo-tour-row .label{display:flex;align-items:center;gap:10px;}
+  .demo-status-pill{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+  .demo-status-pill.done{background:var(--success-bg);color:var(--success);}
+  .demo-status-pill.pending{background:var(--danger-bg);color:var(--danger);}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div style="background:#fff;border-bottom:2px dashed var(--border-strong);padding:12px 20px;font-size:12.5px;color:var(--text-secondary,#5B6472);line-height:1.6;">
+    <strong style="color:var(--ink);">Interactive mockup.</strong> Register, then watch the tour on Home only spotlight steps that aren't satisfied yet. Use the demo panel at the bottom of Home to mark a step satisfied, then use the avatar menu to Log Out and Log back In to see it stay gone.
+  </div>
+
+  <header class="app-header" id="appHeader">
+    <button class="brand" onclick="goTo('home')"><div class="brand-mark">CE</div>Career Edge</button>
+    <nav class="main-nav">
+      <button class="nav-link active" id="navHome" disabled>Home</button>
+      <button class="nav-link" id="navJobs" disabled title="Coming soon">Jobs</button>
+      <button class="nav-link" id="navResources" disabled title="Coming soon">Resources
+        <svg class="chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <button class="nav-link" id="navAppointments" disabled title="Coming soon">Appointments</button>
+    </nav>
+    <span class="staff-badge" id="staffBadge">Staff Console</span>
+    <div class="header-right">
+      <label class="staff-toggle">
+        <input type="checkbox" id="staffViewToggle" onchange="toggleStaffView(this.checked)">
+        <span class="staff-toggle-track"><span class="staff-toggle-thumb"></span></span>
+        <span class="staff-toggle-label">Staff View</span>
+      </label>
+      <button class="icon-btn" disabled title="Coming soon" aria-label="Calendar">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+      </button>
+      <button class="icon-btn" disabled title="Coming soon" aria-label="Notifications">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+      <div class="avatar-menu-wrap">
+        <button class="avatar-trigger" id="userInitials" onclick="toggleAvatarMenu(event)" aria-haspopup="true" aria-expanded="false">JR</button>
+        <div class="avatar-dropdown" id="avatarDropdown">
+          <button class="avatar-dropdown-item" onclick="closeAvatarMenu(); goTo('profile');">View Profile</button>
+          <button class="avatar-dropdown-item danger" onclick="closeAvatarMenu(); handleLogout();">Log Out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="screen active" id="screen-mini-reg">
+      <div class="public-page">
+        <header class="public-header">
+          <button class="brand" onclick="goTo('mini-reg')"><div class="brand-mark">CE</div>Career Edge</button>
+          <nav class="main-nav">
+            <button class="nav-link active" disabled>Home</button>
+            <button class="nav-link" disabled title="Coming soon">Employers</button>
+          </nav>
+          <div class="public-header-actions">
+            <button class="btn btn-outline-invert btn-sm" onclick="goTo('login')">Login</button>
+            <button class="btn btn-invert btn-sm" disabled>Register</button>
+          </div>
+        </header>
+
+        <div class="public-page-body">
+          <div class="reg-card">
+            <h1>Welcome</h1>
+            <p class="lede">Please create an account to get started.</p>
+
+            <form id="miniRegForm" novalidate>
+              <h2 class="reg-section-title">Login Information</h2>
+
+              <div class="field-row">
+                <div class="field">
+                  <label class="f-label" for="firstName">First Name <span class="req">*</span></label>
+                  <input type="text" id="firstName" placeholder="Enter" required>
+                  <div class="field-error" id="err-firstName">Enter your first name.</div>
+                </div>
+                <div class="field">
+                  <label class="f-label" for="lastName">Last Name <span class="req">*</span></label>
+                  <input type="text" id="lastName" placeholder="Enter" required>
+                  <div class="field-error" id="err-lastName">Enter your last name.</div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="f-label" for="email">Email <span class="req">*</span></label>
+                <input type="email" id="email" placeholder="jordan.reyes@email.com" required>
+                <div class="field-error" id="err-email">Enter a valid email address.</div>
+              </div>
+
+              <div class="field">
+                <label class="f-label" for="password">Password <span class="req">*</span></label>
+                <div class="pw-wrap">
+                  <input type="password" id="password" placeholder="Enter" required>
+                  <button type="button" class="pw-toggle" onclick="togglePasswordField('password', this)">Show</button>
+                </div>
+                <ul class="pw-checklist" id="pwChecklist">
+                  <li id="pw-len"><span class="dot">✓</span>At least 8 characters</li>
+                  <li id="pw-upper"><span class="dot">✓</span>One uppercase letter</li>
+                  <li id="pw-num"><span class="dot">✓</span>One number</li>
+                </ul>
+              </div>
+
+              <div class="field">
+                <label class="f-label" for="ssn">Social Security Number (SSN)
+                  <span class="tooltip-wrap"><span class="info-dot">i</span>
+                    <span class="tooltip-bubble">Optional. Providing your SSN lets us verify your identity and determine eligibility for certain workforce services faster.</span></span>
+                </label>
+                <div class="pw-wrap">
+                  <input type="password" id="ssn" placeholder="Optional" maxlength="11">
+                  <button type="button" class="pw-toggle" onclick="togglePasswordField('ssn', this)">Show</button>
+                </div>
+                <div class="field-error" id="err-ssn">Enter a valid 9-digit SSN.</div>
+              </div>
+              <div class="field" id="confirmSsnField" style="display:none;">
+                <label class="f-label" for="confirmSsn">Confirm Social Security Number (SSN) <span class="req">*</span></label>
+                <div class="pw-wrap">
+                  <input type="password" id="confirmSsn" placeholder="Enter" maxlength="11">
+                  <button type="button" class="pw-toggle" onclick="togglePasswordField('confirmSsn', this)">Show</button>
+                </div>
+                <div class="field-error" id="err-confirmSsn">SSN entries don't match.</div>
+              </div>
+
+              <h2 class="reg-section-title">Primary Location Information</h2>
+              <div class="field">
+                <label class="f-label" for="zip">Zip Code <span class="req">*</span>
+                  <span class="tooltip-wrap"><span class="info-dot">i</span>
+                    <span class="tooltip-bubble">Used to show jobs and services near you.</span></span>
+                </label>
+                <input type="text" id="zip" placeholder="Enter" maxlength="5" inputmode="numeric" required>
+                <div class="field-error" id="err-zip">Enter a valid 5-digit ZIP code.</div>
+              </div>
+
+              <h2 class="reg-section-title">Demographic Information</h2>
+              <div class="field">
+                <label class="f-label" for="dob">Date of Birth <span class="req">*</span></label>
+                <input type="date" id="dob" required>
+                <div class="field-error" id="err-dob">You must be 14 or older to register.</div>
+              </div>
+
+              <div class="field">
+                <label class="f-label" for="msfw">MSFW Designation <span class="req">*</span>
+                  <span class="tooltip-wrap"><span class="info-dot">i</span>
+                    <span class="tooltip-bubble">Migrant and Seasonal Farmworker status determines eligibility for specialized outreach services.</span></span>
+                </label>
+                <select id="msfw">
+                  <option value="none">No</option>
+                  <option value="migrant">Migrant Farmworker</option>
+                  <option value="seasonal">Seasonal Farmworker</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label class="f-label" for="veteran">Veteran / Priority Service <span class="req">*</span></label>
+                <select id="veteran">
+                  <option value="none">No</option>
+                  <option value="veteran">Veteran</option>
+                  <option value="spouse">Spouse or Caregiver of a Military member</option>
+                  <option value="both">Both</option>
+                </select>
+              </div>
+
+              <div class="reg-actions">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('miniRegForm').reset(); document.getElementById('confirmSsnField').style.display='none';">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="handleRegister(event)">Create Account</button>
+              </div>
+            </form>
+
+            <div class="foot-link-row">Already have an account? <button class="btn-text" onclick="goTo('login')">Sign in</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 2. REGISTRATION SUCCESS ===================== -->
+    <!-- ===================== 3. LOGIN ===================== -->
+    <section class="screen" id="screen-login">
+      <div class="login-scenic">
+        <div class="login-mountain layer1"></div>
+        <div class="login-mountain layer2"></div>
+        <div class="login-mountain layer3"></div>
+        <div class="login-treeline"></div>
+
+        <button class="back-home-pill" onclick="goTo('mini-reg')">&lsaquo; Back to Home</button>
+
+        <div class="login-content">
+          <div class="login-card">
+            <div class="login-card-body">
+              <h1>Welcome Back!</h1>
+              <p class="login-sub">Please Login:</p>
+              <form id="loginForm" novalidate onsubmit="return handleLogin(event)">
+                <div class="field">
+                  <label class="f-label" for="loginEmail">Email<span class="req">*</span></label>
+                  <input type="email" id="loginEmail" value="jordan.reyes@email.com" required>
+                </div>
+                <div class="field">
+                  <label class="f-label" for="loginPassword">Password<span class="req">*</span></label>
+                  <div class="pw-wrap">
+                    <input type="password" id="loginPassword" value="Password123!" required>
+                    <button type="button" class="pw-eye-toggle" onclick="toggleLoginPasswordVisibility(this)" aria-label="Show password">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-primary btn-full" style="margin-top:6px;" onclick="handleLogin(event)">Login</button>
+              </form>
+              <div class="login-links">
+                <button class="btn-text login-forgot" type="button">Forgot password</button>
+                <div class="login-links-row">
+                  <button class="btn-text" onclick="goTo('mini-reg')">Job Seeker Registration</button>
+                  <span class="login-links-sep">|</span>
+                  <button class="btn-text" disabled title="Coming soon">Employer Registration</button>
+                </div>
+              </div>
+            </div>
+            <div class="login-footer-dark">
+              <div class="login-footer-label">Powered by:</div>
+              <div class="login-footer-brand"><div class="brand-mark" style="width:26px;height:26px;font-size:12px;">CE</div>Career Edge</div>
+              <div class="login-copyright">© 2026 Career Team LLC. All rights reserved.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <button class="a11y-fab" aria-label="Accessibility options" title="Accessibility options">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="7" r="3"/><path d="M5 22v-3a7 7 0 0114 0v3H5z"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================== HOME (landing page after login) ===================== -->
+    <section class="screen" id="screen-home" style="position:relative;">
+      <div class="home-banners-overlay" id="homeBannersOverlay"></div>
+
+      <div class="home-hero">
+        <div class="home-hero-inner">
+          <div class="home-hero-logo"><div class="brand-mark" style="width:40px;height:40px;font-size:18px;">CE</div>Career Edge</div>
+          <div class="home-search-card" id="target-search">
+            <div class="home-search-illustration">
+              <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="var(--slate)" stroke-width="1.6"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/><circle cx="17" cy="17" r="3.4" fill="var(--sand)" stroke="var(--amber)"/><path d="M18.6 18.6L20 20" stroke="var(--amber)"/></svg>
+            </div>
+            <div class="home-search-form">
+              <h2>Search Job</h2>
+              <div class="home-search-inputs">
+                <input type="text" placeholder="Job title, company, keyword" disabled title="Coming soon">
+                <input type="text" placeholder="City" disabled title="Coming soon">
+                <button class="btn btn-primary" disabled title="Coming soon">Search Jobs</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="home-lower">
+        <div class="home-lower-inner">
+          <div class="home-panel">
+            <h3>On-Demand Services</h3>
+            <div class="ondemand-grid">
+              <button class="ondemand-item" onclick="openTile('resume')">
+                <span class="ondemand-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span>
+                Create a Resume
+              </button>
+              <button class="ondemand-item disabled" disabled title="Coming soon">
+                <span class="ondemand-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="8" width="16" height="10" rx="2"/><path d="M8 8V6a4 4 0 018 0v2"/></svg></span>
+                Practice Interviewing
+              </button>
+              <button class="ondemand-item disabled" disabled title="Coming soon">
+                <span class="ondemand-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg></span>
+                Find Your Local Workforce Center
+              </button>
+              <button class="ondemand-item disabled" disabled title="Coming soon">
+                <span class="ondemand-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v18M5 4h11l-2 3.5L16 11H5"/></svg></span>
+                Veteran's Service
+              </button>
+            </div>
+          </div>
+          <div class="home-panel">
+            <h3>News and Announcements</h3>
+            <div class="news-list">
+              <div class="news-item"><strong>Hiring Event — Coastal Logistics</strong><span>Meet local employers hiring for warehouse and driving roles. Thursday, Sept 10, 10:00 AM – 2:00 PM at the Salinas Workforce Center.</span></div>
+              <div class="news-item"><strong>Monterey County Job Fair</strong><span>Open to all job seekers. Friday, Sept 18, 11:00 AM – 3:00 PM at the Monterey Conference Center, 1 Portola Plaza.</span></div>
+              <div class="news-item"><strong>Resume Workshop</strong><span>Drop-in resume review with career staff, no appointment required. Every Tuesday, 1:00 PM – 4:00 PM.</span></div>
+              <div class="news-item"><strong>Veteran Priority Services Info Session</strong><span>Learn about priority-of-service benefits available to veterans and eligible spouses. Wednesday, Sept 24, 9:00 AM.</span></div>
+              <div class="news-item"><strong>Seasonal Agricultural Hiring Push</strong><span>Several Watsonville-area employers are hiring for the fall harvest season. Housing assistance available for qualifying workers.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-tour-panel">
+        <h4>Demo controls — not part of the real product</h4>
+        <div class="demo-tour-row">
+          <span class="label">Profile complete <span class="demo-status-pill pending" id="pill-profile">Pending</span></span>
+          <button class="btn btn-secondary btn-sm" onclick="goTo('profile')">Go to Profile</button>
+        </div>
+        <div class="demo-tour-row">
+          <span class="label">Appointment booked <span class="demo-status-pill pending" id="pill-appointment">Pending</span></span>
+          <button class="btn btn-secondary btn-sm" onclick="toggleState('appointmentBooked')">Toggle</button>
+        </div>
+        <div class="demo-tour-row">
+          <span class="label">Job search tried <span class="demo-status-pill pending" id="pill-search">Pending</span></span>
+          <button class="btn btn-secondary btn-sm" onclick="toggleState('hasSearchedJobs')">Toggle</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-profile">
+      <div class="page-wrap">
+        <div class="profile-layout">
+          <aside class="profile-sidebar">
+            <div class="profile-avatar-lg" id="profileAvatarLg">JR</div>
+            <h2 class="profile-name" id="profileName">Jordan Reyes</h2>
+            <div class="profile-meta-row">State ID <strong>248915</strong></div>
+            <div class="profile-meta-row">Profile Completion <strong id="profileCompletionPct">0%</strong></div>
+            <div class="profile-status"><span class="status-dot"></span>Active</div>
+
+            <ul class="profile-contact-list">
+              <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg><span>03/14/2001 — 25 yrs.</span></li>
+              <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="9" cy="12" r="2"/><path d="M15 10h3M15 14h3"/></svg><span>XXX-XX-6721</span></li>
+              <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3 19.5 19.5 0 01-6-6 19.8 19.8 0 01-3-8.7A2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .3 2 .7 3a2 2 0 01-.4 2.1L8 10.3a16 16 0 006 6l1.5-1.5a2 2 0 012.1-.4c1 .4 2 .6 3 .7a2 2 0 011.4 2z"/></svg><span>(831) 555-0148</span></li>
+              <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span id="profileEmailMasked">jo****@email.com</span></li>
+              <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg><span>123 Ocean View Ave, Salinas, CA 93940</span></li>
+            </ul>
+
+            <div class="profile-registration">
+              Registration Source: Self<br>
+              Date: 09/03/2026
+            </div>
+
+            <button class="btn-text" style="padding-left:0;">Change Password</button>
+          </aside>
+
+          <div class="profile-main">
+            <div class="profile-tabs">
+              <button class="profile-tab active" disabled>Profile Information</button>
+              <button class="profile-tab" disabled title="Coming soon">Forms &amp; Documents</button>
+              <button class="profile-tab" disabled title="Coming soon">Programs Overview</button>
+              <button class="profile-tab" disabled title="Coming soon">Resume Builder</button>
+              <button class="profile-tab" disabled title="Coming soon">My Interviews</button>
+            </div>
+            <div id="profileCompletionNote"></div>
+            <div style="margin:-6px 0 18px;text-align:right;">
+              <button class="btn-text" style="font-size:12.5px;" id="simulateCompleteBtn" onclick="simulateCompleteProfile()">Demo: mark all remaining sections complete</button>
+            </div>
+            <div class="tiles-grid" id="tilesGrid"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== GUIDED WALKTHROUGH SETTINGS (Staff View) ===================== -->
+    <section class="screen" id="screen-tour-settings">
+      <div style="max-width:820px;margin:0 auto;padding:32px 24px 60px;">
+        <p style="font-size:12px;color:var(--text-secondary,#5B6472);margin:0 0 10px;font-weight:600;letter-spacing:.2px;">SETTINGS &nbsp;›&nbsp; CUSTOMIZATION &nbsp;›&nbsp; GUIDED WALKTHROUGH</p>
+        <h1 style="font-family:var(--font-serif);font-size:26px;font-weight:600;margin:0 0 6px;">Guided Walkthrough Settings</h1>
+        <p style="font-size:14px;color:var(--text-secondary,#5B6472);margin:0 0 24px;line-height:1.6;">
+          Manage the first-login walkthrough steps. Drag a row to change the order it's shown in — the topmost active, unsatisfied step is always highlighted first. Turn a step off entirely, or edit what it says, from its editor.
+          <br><br><strong>Super Admin access only.</strong> This MVP covers the Jobseeker Registration/Login flow only — there's no guided walkthrough support yet for other roles or for other pages, features, or flows.
+        </p>
+        <div id="tourStepsList"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== Tour step editor drawer ===================== -->
+  <div class="overlay" id="overlayTourStepEditor">
+    <div class="drawer">
+      <div class="drawer-header">
+        <h2 id="tourStepEditorTitle">Edit Step</h2>
+        <button class="drawer-close" onclick="closeModal('overlayTourStepEditor')" aria-label="Close">&times;</button>
+      </div>
+      <div class="drawer-body">
+        <div class="field">
+          <label class="f-label" for="ts_name">Internal name</label>
+          <input type="text" id="ts_name" placeholder="e.g. Update Profile">
+        </div>
+        <div class="field">
+          <label class="f-label">Condition</label>
+          <div class="condition-sentence" id="ts_conditionDisplay" style="display:flex;"><span>—</span></div>
+          <p class="field-hint">This step only appears when its condition is not yet met. The condition itself is fixed and can't be changed here.</p>
+        </div>
+        <div class="field">
+          <label class="f-label">Highlights</label>
+          <div class="condition-sentence" id="ts_targetDisplay" style="display:flex;"><span>—</span></div>
+          <p class="field-hint">Each step is scoped to the element it was built for, so what it highlights can't be changed here.</p>
+        </div>
+        <div class="field">
+          <label class="f-label" for="ts_title">Callout title (shown to job seekers)</label>
+          <input type="text" id="ts_title" placeholder="Update your profile here">
+        </div>
+        <div class="field">
+          <label class="f-label" for="ts_description">Callout description</label>
+          <input type="text" id="ts_description" placeholder="One short supporting line">
+        </div>
+        <div class="field">
+          <label class="f-label">Status</label>
+          <label class="mini-toggle" style="margin-top:6px;">
+            <input type="checkbox" id="ts_active" checked>
+            <span class="mini-toggle-track"><span class="mini-toggle-thumb"></span></span>
+            <span style="font-size:13px;color:#3A4453;margin-left:8px;">Active</span>
+          </label>
+        </div>
+      </div>
+      <div class="drawer-footer">
+        <button class="btn btn-secondary" onclick="closeModal('overlayTourStepEditor')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveTourStepEditor()">Save</button>
+      </div>
+    </div>
+  </div>
+
+<div class="overlay center" id="overlayProfileComplete">
+  <div class="modal-box prompt-modal" style="text-align:center;">
+    <div class="success-icon" style="margin:0 auto 16px;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+    <h2>🎉 Congratulations!</h2>
+    <p>Your profile is 100% complete. Employers can now see a full picture of your experience, and applications will go faster since your information is already on file.</p>
+    <div class="prompt-actions">
+      <button class="btn btn-primary btn-full" id="bookApptFromCelebration" onclick="closeModal('overlayProfileComplete'); tourState.appointmentBooked = true; refreshDemoPanel(); showToast('Appointment booked (demo)');">Book an Appointment</button>
+      <button class="btn btn-secondary btn-full" onclick="closeModal('overlayProfileComplete'); tourState.hasSearchedJobs = true; refreshDemoPanel(); goTo('home');">Explore Jobs</button>
+      <button class="btn-text" style="align-self:center;" onclick="closeModal('overlayProfileComplete');">Stay on Profile</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== Generic profile edit drawer ===================== -->
+<div class="overlay" id="overlayEditDrawer">
+  <div class="drawer">
+    <div class="drawer-header">
+      <h2 id="drawerTitle">Edit section</h2>
+      <button class="drawer-close" onclick="closeModal('overlayEditDrawer')" aria-label="Close">&times;</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+    <div class="drawer-footer">
+      <button class="btn btn-secondary" onclick="closeModal('overlayEditDrawer')">Cancel</button>
+      <button class="btn btn-primary" id="drawerSaveBtn" onclick="saveDrawer()">Save</button>
+    </div>
+  </div>
+</div>
+
+  <div class="save-toast" id="saveToast"><div class="dot-ok"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></div><span id="saveToastText">Saved</span></div>
+
+  <!-- ===================== Guided tour overlay (fixed to viewport) ===================== -->
+  <div class="dim-overlay" id="dimOverlay"></div>
+
+  <div class="tour-tooltip" id="tourTooltip">
+    <h3 id="tourTooltipTitle">Title</h3>
+    <p id="tourTooltipDesc">Description</p>
+    <div class="row"><span class="step-count" id="tourTooltipStepCount">1 of 1</span>
+      <div class="actions"><button class="tour-btn-skip" id="tourTooltipSkip" onclick="endTour()">Skip</button><button class="tour-btn-next" id="tourTooltipNext">Next</button></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ================= NAVIGATION ================= */
+function goTo(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  const header = document.getElementById('appHeader');
+  const authScreens = ['mini-reg','login'];
+  header.classList.toggle('visible', !authScreens.includes(name));
+  window.scrollTo(0,0);
+  if(name==='profile') renderProfile();
+}
+
+/* ================= AVATAR MENU ================= */
+function toggleAvatarMenu(e){
+  e.stopPropagation();
+  document.getElementById('avatarDropdown').classList.toggle('open');
+}
+function closeAvatarMenu(){
+  document.getElementById('avatarDropdown').classList.remove('open');
+}
+document.addEventListener('click', function(e){
+  const wrap = document.querySelector('.avatar-menu-wrap');
+  if(wrap && !wrap.contains(e.target)) closeAvatarMenu();
+});
+
+/* ================= PASSWORD / SSN FIELD HELPERS ================= */
+function togglePasswordField(id, btn){
+  const el = document.getElementById(id);
+  if(el.type === 'password'){ el.type='text'; btn.textContent='Hide'; } else { el.type='password'; btn.textContent='Show'; }
+}
+document.getElementById('password').addEventListener('input', function(e){
+  const v = e.target.value;
+  document.getElementById('pw-len').classList.toggle('met', v.length >= 8);
+  document.getElementById('pw-upper').classList.toggle('met', /[A-Z]/.test(v));
+  document.getElementById('pw-num').classList.toggle('met', /[0-9]/.test(v));
+});
+function formatSsnInput(e){
+  let digits = e.target.value.replace(/\D/g,'').slice(0,9);
+  let formatted = digits;
+  if(digits.length > 5) formatted = digits.slice(0,3)+'-'+digits.slice(3,5)+'-'+digits.slice(5);
+  else if(digits.length > 3) formatted = digits.slice(0,3)+'-'+digits.slice(3);
+  e.target.value = formatted;
+}
+document.getElementById('ssn').addEventListener('input', formatSsnInput);
+document.getElementById('confirmSsn').addEventListener('input', formatSsnInput);
+document.getElementById('ssn').addEventListener('input', function(e){
+  const hasValue = e.target.value.replace(/\D/g,'').length > 0;
+  document.getElementById('confirmSsnField').style.display = hasValue ? 'block' : 'none';
+  if(!hasValue) document.getElementById('confirmSsn').value = '';
+});
+document.getElementById('zip').addEventListener('input', function(e){
+  e.target.value = e.target.value.replace(/\D/g,'').slice(0,5);
+});
+
+/* ================= REGISTER / LOGIN / LOGOUT ================= */
+document.getElementById('miniRegForm').addEventListener('submit', handleRegister);
+
+function handleRegister(e){
+  if(e && e.preventDefault) e.preventDefault();
+  state.user.firstName = document.getElementById('firstName').value.trim() || 'Jordan';
+  state.user.lastName = document.getElementById('lastName').value.trim() || 'Reyes';
+  state.user.email = document.getElementById('email').value.trim();
+  state.user.zip = document.getElementById('zip').value.trim() || state.user.zip;
+
+  // MR-07: registration answers flow into the Military / Farmworker Information tiles.
+  const msfwVal = document.getElementById('msfw').value;
+  const veteranVal = document.getElementById('veteran').value;
+  const msfwLabels = {migrant:'Migrant Farmworker', seasonal:'Seasonal Farmworker', none:'No'};
+  const veteranLabels = {veteran:'Veteran', spouse:'Spouse or Caregiver of a Military member', both:'Veteran and Spouse or Caregiver of a Military member', none:'No'};
+  state.user.msfwStatus = msfwLabels[msfwVal] || 'No';
+  state.user.veteranStatus = veteranLabels[veteranVal] || 'No';
+  state.tiles.military.status = 'complete';
+  state.tiles.farmworker.status = 'complete';
+
+  syncIdentityDisplays();
+  goTo('home');
+  startTourIfNeeded();
+  return false;
+}
+function handleLogin(e){
+  if(e && e.preventDefault) e.preventDefault();
+  goTo('home');
+  startTourIfNeeded();
+  return false;
+}
+function handleLogout(){
+  endTour();
+  goTo('login');
+}
+
+/* ================= GUIDED TOUR (conditional, persists across logins, staff-configurable) ================= */
+const tourState = { appointmentBooked:false, hasSearchedJobs:false };
+
+/* ================= PROFILE STATE (real, backs the "profile" tour step) ================= */
+const state = {
+  user:{firstName:'Jordan', lastName:'Reyes', email:'', zip:'93940'},
+  tiles:{
+    personal:{status:'complete'},
+    contact:{status:'not-started'},
+    education:{status:'not-started'},
+    employment:{status:'not-started'},
+    skills:{status:'not-started'},
+    resume:{status:'not-started'},
+    programs:{status:'complete'},
+    military:{status:'not-started'},
+    farmworker:{status:'not-started'},
+    jobPreference:{status:'not-started'}
+  }
+};
+
+const TILE_META = {
+  personal:{title:'Demographic Information', notStartedCopy:'Your legal name, date of birth, and SSN on file.'},
+  skills:{title:'Skills, Technologies, Summary', notStartedCopy:'List skills and tools so employers can find you for the right roles.'},
+  contact:{title:'Contact Information', notStartedCopy:'Add your mailing address, phone number, and preferred contact method.'},
+  education:{title:'Educational Background', notStartedCopy:'Add schools, certifications, or training programs you\'ve completed.'},
+  military:{title:'Military Information', notStartedCopy:'Veteran or priority-of-service status collected during registration.'},
+  jobPreference:{title:'Job Preference', notStartedCopy:'Tell us your preferred job type, schedule, and pay range so we can tailor your matches.'},
+  employment:{title:'Employment History', notStartedCopy:'Add previous jobs to help us match you with similar roles.'},
+  farmworker:{title:'Farmworker Information', notStartedCopy:'Migrant and Seasonal Farmworker designation collected during registration.'},
+  resume:{title:'My Resume', notStartedCopy:'Upload a resume, or build one from your profile information.'},
+  programs:{title:'Programs & Services', notStartedCopy:'Review workforce programs you may be eligible for.'}
+};
+
+function computeCompletion(){
+  const keys = Object.keys(TILE_META);
+  let total = 0, earned = 0;
+  keys.forEach(k=>{
+    total += 1;
+    const st = state.tiles[k].status;
+    earned += st==='complete' ? 1 : st==='partial' ? 0.5 : 0;
+  });
+  return Math.round((earned/total)*100);
+}
+function pctForStatus(st){ return st==='complete' ? 100 : st==='partial' ? 50 : 0; }
+function pctColorClass(st){ return st==='complete' ? 'pct-complete' : st==='partial' ? 'pct-partial' : 'pct-none'; }
+
+function syncIdentityDisplays(){
+  const initials = (state.user.firstName[0]||'J')+(state.user.lastName[0]||'R');
+  const fullName = state.user.firstName+' '+state.user.lastName;
+  document.getElementById('userInitials').textContent = initials;
+  const avatarLg = document.getElementById('profileAvatarLg');
+  const nameEl = document.getElementById('profileName');
+  if(avatarLg) avatarLg.textContent = initials;
+  if(nameEl) nameEl.textContent = fullName;
+}
+
+function renderProfile(){
+  const pct = computeCompletion();
+  document.getElementById('profileCompletionPct').textContent = pct+'%';
+  renderProfileCompletionNote(pct);
+  const simBtn = document.getElementById('simulateCompleteBtn');
+  if(simBtn) simBtn.style.display = pct >= 100 ? 'none' : 'inline-flex';
+
+  const grid = document.getElementById('tilesGrid');
+  grid.innerHTML = '';
+  Object.keys(TILE_META).forEach(key=>{
+    const st = state.tiles[key].status;
+    const meta = TILE_META[key];
+    let tileClass = 'tile-v2';
+    if(st === 'not-started') tileClass += ' needs-attention';
+    else if(st === 'partial') tileClass += ' in-progress';
+    const div = document.createElement('div');
+    div.className = tileClass;
+    div.innerHTML = `
+      <div class="tile-avatar">${meta.title.charAt(0)}</div>
+      <h3>${meta.title}</h3>
+      <div class="tile-pct ${pctColorClass(st)}">${pctForStatus(st)}%</div>
+    `;
+    div.addEventListener('click', ()=>openTile(key));
+    grid.appendChild(div);
+  });
+  refreshDemoPanel();
+}
+
+function renderProfileCompletionNote(pct){
+  const el = document.getElementById('profileCompletionNote');
+  if(!el) return;
+  if(pct >= 100){
+    el.innerHTML = `
+      <div class="profile-note complete oneline">
+        <div class="profile-note-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <span>Your profile is complete! Employers can now see a full picture of your experience.</span>
+      </div>`;
+  } else {
+    el.innerHTML = `
+      <div class="profile-note oneline">
+        <div class="profile-note-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.6 17a2 2 0 001.7 3h15.4a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg></div>
+        <span>Complete your profile to improve your job matches.</span>
+      </div>`;
+  }
+}
+
+function openTile(key){
+  const meta = TILE_META[key];
+  let titlePrefix = state.tiles[key].status==='complete' ? 'Edit ' : 'Add ';
+  if(key==='military' || key==='farmworker') titlePrefix = '';
+  document.getElementById('drawerTitle').textContent = titlePrefix + meta.title;
+  const body = document.getElementById('drawerBody');
+  document.getElementById('overlayEditDrawer').dataset.section = key;
+  document.getElementById('drawerSaveBtn').textContent = (key==='military' || key==='farmworker') ? 'Close' : 'Save';
+
+  if(key==='contact'){
+    body.innerHTML = `
+      <div class="field"><label class="f-label">Street address</label><input type="text" id="d_address" value="${state.contactData?.address||''}" placeholder="123 Ocean View Ave"></div>
+      <div class="field-row">
+        <div class="field"><label class="f-label">City</label><input type="text" id="d_city" value="${state.contactData?.city||''}" placeholder="Salinas"></div>
+        <div class="field"><label class="f-label">State</label><input type="text" id="d_state" value="${state.contactData?.state||'CA'}" placeholder="CA"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label class="f-label">ZIP code</label><input type="text" id="d_zip" value="${state.contactData?.zip||state.user.zip}" maxlength="5"></div>
+        <div class="field"><label class="f-label">Phone number</label><input type="text" id="d_phone" value="${state.contactData?.phone||''}" placeholder="(831) 555-0148"></div>
+      </div>
+      <div class="field"><label class="f-label">Preferred contact method</label>
+        <select id="d_contactPref"><option>Email</option><option>Phone</option><option>Text message</option></select>
+      </div>`;
+  } else if(key==='education'){
+    body.innerHTML = `
+      <div class="field"><label class="f-label">School or training program</label><input type="text" id="d_school" value="${state.educationData?.school||''}" placeholder="Hartnell College"></div>
+      <div class="field"><label class="f-label">Credential or degree</label><input type="text" id="d_credential" value="${state.educationData?.credential||''}" placeholder="A.A., Business Administration"></div>
+      <div class="field"><label class="f-label">Completion year</label><input type="text" id="d_year" placeholder="2023"></div>`;
+  } else if(key==='employment'){
+    body.innerHTML = `
+      <div class="field"><label class="f-label">Job title</label><input type="text" id="d_title" value="${state.employmentData?.title||''}" placeholder="Line Cook"></div>
+      <div class="field"><label class="f-label">Employer</label><input type="text" id="d_employer" value="${state.employmentData?.employer||''}" placeholder="Sea Breeze Cafe"></div>
+      <div class="field-row">
+        <div class="field"><label class="f-label">Start date</label><input type="text" id="d_start" placeholder="03/2022"></div>
+        <div class="field"><label class="f-label">End date</label><input type="text" id="d_end" placeholder="Present"></div>
+      </div>`;
+  } else if(key==='skills'){
+    body.innerHTML = `
+      <div class="field"><label class="f-label">Skills & technology</label>
+      <input type="text" id="d_skills" value="${(state.skillsData||[]).join(', ')}" placeholder="Forklift Operation, Customer Service, Microsoft Excel">
+      <p class="field-hint">Separate skills with commas.</p></div>`;
+  } else if(key==='resume'){
+    body.innerHTML = `
+      <div class="field"><label class="f-label">Resume file</label>
+        <div style="border:1.5px dashed var(--border-strong); border-radius:6px; padding:26px; text-align:center; color:#707A8A; font-size:13.5px;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8A94A6" stroke-width="1.6" style="margin-bottom:8px;"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+          <div>Drop a file here, or</div>
+          <button type="button" class="btn btn-secondary btn-sm" style="margin-top:8px;" onclick="simulateUpload()">Choose File</button>
+          <div id="uploadedFileName" style="margin-top:8px;font-weight:600;color:${state.resumeData?'var(--success)':'#8A94A6'};">${state.resumeData?state.resumeData.filename:'No file selected'}</div>
+        </div>
+      </div>`;
+  } else if(key==='personal'){
+    body.innerHTML = `
+      <div class="field"><label class="f-label">First name</label><input type="text" id="d_fn" value="${state.user.firstName}"></div>
+      <div class="field"><label class="f-label">Last name</label><input type="text" id="d_ln" value="${state.user.lastName}"></div>
+      <div class="field"><label class="f-label">Social Security Number</label><input type="text" value="XXX-XX-6721" disabled style="background:#F2F3F5;color:#8A94A6;"></div>
+      <p class="checklist-note">To update your SSN or date of birth, please contact your local Career Edge office to verify your identity.</p>`;
+  } else if(key==='programs'){
+    body.innerHTML = `
+      <div class="field"><p class="tile-body" style="margin-bottom:14px;">These program eligibility determinations are reviewed by Career Edge staff. No action is required from you right now.</p></div>
+      <ul class="missing-list">
+        <li><span class="req-dot" style="background:var(--success);"></span>WIOA Adult Program — eligible</li>
+        <li><span class="req-dot"></span>Veteran priority of service — pending review</li>
+      </ul>`;
+  } else if(key==='military'){
+    body.innerHTML = `
+      <p class="tile-body" style="margin-bottom:14px;">Veteran and priority-of-service status collected when you registered.</p>
+      <ul class="tile-fields"><li><strong>${state.user.veteranStatus||'No'}</strong></li></ul>
+      <p class="checklist-note">To update this information, please contact your local Career Edge office to verify your status.</p>`;
+  } else if(key==='farmworker'){
+    body.innerHTML = `
+      <p class="tile-body" style="margin-bottom:14px;">Migrant and Seasonal Farmworker (MSFW) designation collected when you registered.</p>
+      <ul class="tile-fields"><li><strong>${state.user.msfwStatus||'No'}</strong></li></ul>
+      <p class="checklist-note">To update this information, please contact your local Career Edge office to verify your status.</p>`;
+  } else if(key==='jobPreference'){
+    body.innerHTML = `
+      <div class="field"><label class="f-label">Preferred job type</label>
+        <select id="d_jobType">
+          <option${state.jobPrefData?.type==='Part-time'?' selected':''}>Full-time</option>
+          <option${state.jobPrefData?.type==='Part-time'?' selected':''}>Part-time</option>
+          <option${state.jobPrefData?.type==='Seasonal'?' selected':''}>Seasonal</option>
+          <option${state.jobPrefData?.type==='Temporary'?' selected':''}>Temporary</option>
+        </select>
+      </div>
+      <div class="field"><label class="f-label">Minimum pay</label><input type="text" id="d_jobPay" value="${state.jobPrefData?.pay||''}" placeholder="$18.00/hr"></div>
+      <div class="field"><label class="f-label">Willing to relocate?</label>
+        <select id="d_jobRelocate"><option>No</option><option>Yes</option></select>
+      </div>`;
+  }
+  openModal('overlayEditDrawer');
+}
+
+let pendingUploadFilename = 'Jordan_Reyes_Resume.pdf';
+function simulateUpload(){
+  document.getElementById('uploadedFileName').textContent = pendingUploadFilename;
+  document.getElementById('uploadedFileName').style.color = 'var(--success)';
+}
+
+function saveDrawer(){
+  const key = document.getElementById('overlayEditDrawer').dataset.section;
+  const pctBefore = computeCompletion();
+  if(key==='contact'){
+    state.contactData = { address:val('d_address'), city:val('d_city'), state:val('d_state'), zip:val('d_zip'), phone:val('d_phone') };
+    state.tiles.contact.status = (state.contactData.address && state.contactData.city && state.contactData.phone) ? 'complete' : 'partial';
+  } else if(key==='education'){
+    state.educationData = {school:val('d_school'), credential:val('d_credential')};
+    state.tiles.education.status = state.educationData.school ? 'complete' : 'not-started';
+  } else if(key==='employment'){
+    state.employmentData = {title:val('d_title'), employer:val('d_employer')};
+    state.tiles.employment.status = state.employmentData.title ? 'complete' : 'not-started';
+  } else if(key==='skills'){
+    const raw = val('d_skills');
+    state.skillsData = raw ? raw.split(',').map(s=>s.trim()).filter(Boolean) : [];
+    state.tiles.skills.status = state.skillsData.length ? 'complete' : 'not-started';
+  } else if(key==='resume'){
+    const uploaded = document.getElementById('uploadedFileName').textContent !== 'No file selected';
+    if(uploaded){
+      state.resumeData = {filename: pendingUploadFilename, date:'just now'};
+      state.tiles.resume.status = 'complete';
+    }
+  } else if(key==='personal'){
+    state.user.firstName = val('d_fn') || state.user.firstName;
+    state.user.lastName = val('d_ln') || state.user.lastName;
+    syncIdentityDisplays();
+  } else if(key==='programs'){
+    state.tiles.programs.status = 'complete';
+  } else if(key==='jobPreference'){
+    state.jobPrefData = {type: val('d_jobType'), pay: val('d_jobPay'), relocate: val('d_jobRelocate')};
+    state.tiles.jobPreference.status = state.jobPrefData.pay ? 'complete' : 'partial';
+  }
+  closeModal('overlayEditDrawer');
+  renderProfile();
+  if(key!=='military' && key!=='farmworker') showToast('Saved');
+  maybeCelebrateProfileCompletion(pctBefore);
+}
+function val(id){ const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+/* ================= PROFILE COMPLETION CELEBRATION ================= */
+function maybeCelebrateProfileCompletion(pctBefore){
+  const pctAfter = computeCompletion();
+  if(pctBefore < 100 && pctAfter >= 100){
+    setTimeout(()=>openProfileCompleteModal(), 450);
+  }
+}
+function openProfileCompleteModal(){
+  document.getElementById('bookApptFromCelebration').style.display = tourState.appointmentBooked ? 'none' : 'inline-flex';
+  openModal('overlayProfileComplete');
+}
+
+/* Demo convenience: instantly fills in every remaining section so the team
+   can preview the completion celebration without clicking through each
+   drawer individually. */
+function simulateCompleteProfile(){
+  const pctBefore = computeCompletion();
+  if(pctBefore >= 100){ showToast('Profile is already complete'); return; }
+  state.tiles.personal.status = 'complete';
+  state.tiles.contact.status = 'complete';
+  state.contactData = state.contactData || {address:'123 Ocean View Ave', city:'Salinas', state:'CA', zip:state.user.zip, phone:'(831) 555-0148'};
+  state.tiles.education.status = 'complete';
+  state.educationData = state.educationData || {school:'Hartnell College', credential:'A.A., Business Administration'};
+  state.tiles.employment.status = 'complete';
+  state.employmentData = state.employmentData || {title:'Line Cook', employer:'Sea Breeze Cafe'};
+  state.tiles.skills.status = 'complete';
+  state.skillsData = (state.skillsData && state.skillsData.length) ? state.skillsData : ['Forklift Operation','Customer Service','Microsoft Excel'];
+  state.tiles.resume.status = 'complete';
+  state.resumeData = state.resumeData || {filename:'Jordan_Reyes_Resume.pdf', date:'just now'};
+  state.tiles.programs.status = 'complete';
+  state.tiles.military.status = 'complete';
+  state.tiles.farmworker.status = 'complete';
+  state.tiles.jobPreference.status = 'complete';
+  state.jobPrefData = state.jobPrefData || {type:'Full-time', pay:'$18.00/hr', relocate:'No'};
+  renderProfile();
+  maybeCelebrateProfileCompletion(pctBefore);
+}
+
+function openModal(id){ document.getElementById(id).classList.add('active'); }
+function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+function showToast(msg){
+  const t = document.getElementById('saveToast');
+  document.getElementById('saveToastText').textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* Order of this array IS the highlight hierarchy — dragging rows in Settings
+   reorders this array directly. "target" and "position" are locked (the step
+   is scoped to the element it was built for); name/title/description/active
+   are editable from the settings screen. */
+let TOUR_STEPS = [
+  {
+    id:'profile', name:'Update Profile', target:'userInitials', targetLabel:'Your avatar (top right)',
+    conditionLabel:'Shown if: Profile is not complete yet',
+    title:'Update your profile here', description:"Your profile isn't complete yet — open the menu under your avatar to finish it.",
+    active:true, position:{top:'70px', right:'150px'},
+    satisfied: () => computeCompletion() >= 100
+  },
+  {
+    id:'appointment', name:'Book Appointment', target:'navAppointments', targetLabel:'"Appointments" in the top nav',
+    conditionLabel:'Shown if: No appointment booked yet',
+    title:'Book an appointment here', description:"You haven't booked one yet — meet with a career counselor whenever you're ready.",
+    active:true, position:{top:'70px', right:'260px'},
+    satisfied: () => tourState.appointmentBooked
+  },
+  {
+    id:'search', name:'Search Jobs', target:'target-search', targetLabel:'The job search card on Home',
+    conditionLabel:'Shown if: Haven\'t searched for jobs yet',
+    title:'Search for jobs here', description:"You haven't tried a job search yet — enter a title, company, or keyword to get started.",
+    active:true, position:{top:'180px', left:'50%', transform:'translateX(-50%)'},
+    satisfied: () => tourState.hasSearchedJobs
+  }
+];
+
+let tourQueue = [];
+let tourIndex = 0;
+
+function startTourIfNeeded(){
+  endTour();
+  tourQueue = TOUR_STEPS.filter(s => s.active && !s.satisfied());
+  tourIndex = 0;
+  if(tourQueue.length === 0) return; // everything active is already satisfied — no tour this login
+  document.getElementById('dimOverlay').classList.add('active');
+  showCurrentTourStep();
+}
+function showCurrentTourStep(){
+  TOUR_STEPS.forEach(s => document.getElementById(s.target).classList.remove('spotlight'));
+  const step = tourQueue[tourIndex];
+  const tooltip = document.getElementById('tourTooltip');
+  if(!step){ tooltip.classList.remove('show'); return; }
+
+  document.getElementById(step.target).classList.add('spotlight');
+  tooltip.style.top = step.position.top || '';
+  tooltip.style.right = step.position.right || '';
+  tooltip.style.left = step.position.left || '';
+  tooltip.style.bottom = step.position.bottom || '';
+  tooltip.style.transform = step.position.transform || '';
+  document.getElementById('tourTooltipTitle').textContent = step.title;
+  document.getElementById('tourTooltipDesc').textContent = step.description;
+  document.getElementById('tourTooltipStepCount').textContent = (tourIndex+1)+' of '+tourQueue.length;
+
+  const isLast = tourIndex === tourQueue.length - 1;
+  const nextBtn = document.getElementById('tourTooltipNext');
+  nextBtn.textContent = isLast ? 'Got it' : 'Next';
+  nextBtn.onclick = isLast ? endTour : advanceTour;
+  document.getElementById('tourTooltipSkip').style.display = isLast ? 'none' : 'inline-block';
+
+  tooltip.classList.add('show');
+}
+function advanceTour(){
+  tourIndex++;
+  if(tourIndex >= tourQueue.length){ endTour(); return; }
+  showCurrentTourStep();
+}
+function endTour(){
+  document.getElementById('dimOverlay').classList.remove('active');
+  document.getElementById('tourTooltip').classList.remove('show');
+  TOUR_STEPS.forEach(s => document.getElementById(s.target).classList.remove('spotlight'));
+}
+
+/* Clicking the (disabled-in-real-life, active-in-this-demo) search button counts as satisfying that step. */
+document.querySelector('.home-search-inputs .btn').removeAttribute('disabled');
+document.querySelector('.home-search-inputs .btn').addEventListener('click', function(){
+  tourState.hasSearchedJobs = true;
+  refreshDemoPanel();
+  if(tourQueue[tourIndex] && tourQueue[tourIndex].id === 'search') advanceTour();
+});
+
+/* ================= DEMO PANEL (simulating profile/appointment/search progress) ================= */
+function toggleState(key){
+  tourState[key] = !tourState[key];
+  refreshDemoPanel();
+}
+function refreshDemoPanel(){
+  setPill('pill-profile', computeCompletion() >= 100);
+  setPill('pill-appointment', tourState.appointmentBooked);
+  setPill('pill-search', tourState.hasSearchedJobs);
+}
+function setPill(id, done){
+  const el = document.getElementById(id);
+  el.textContent = done ? 'Done' : 'Pending';
+  el.className = 'demo-status-pill ' + (done ? 'done' : 'pending');
+}
+refreshDemoPanel();
+
+/* ================= STAFF VIEW ================= */
+function toggleStaffView(isStaff){
+  document.getElementById('appHeader').classList.toggle('staff-mode', isStaff);
+  renderAvatarDropdown(isStaff);
+  goTo(isStaff ? 'tour-settings' : 'home');
+  if(isStaff) renderTourStepsList();
+}
+function renderAvatarDropdown(isStaff){
+  const dd = document.getElementById('avatarDropdown');
+  dd.innerHTML = isStaff
+    ? `<button class="avatar-dropdown-item" onclick="closeAvatarMenu(); document.getElementById('staffViewToggle').checked=false; toggleStaffView(false);">Exit Staff View</button>
+       <button class="avatar-dropdown-item danger" onclick="closeAvatarMenu(); handleLogout();">Log Out</button>`
+    : `<button class="avatar-dropdown-item" onclick="closeAvatarMenu(); goTo('profile');">View Profile</button>
+       <button class="avatar-dropdown-item danger" onclick="closeAvatarMenu(); handleLogout();">Log Out</button>`;
+}
+
+/* ================= GUIDED WALKTHROUGH SETTINGS (drag-and-drop = highlight order) ================= */
+function renderTourStepsList(){
+  const container = document.getElementById('tourStepsList');
+  container.innerHTML = TOUR_STEPS.map(s => `
+    <div class="admin-row" draggable="true" data-id="${s.id}">
+      <span class="drag-handle" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="8" cy="6" r="1.6"/><circle cx="16" cy="6" r="1.6"/><circle cx="8" cy="12" r="1.6"/><circle cx="16" cy="12" r="1.6"/><circle cx="8" cy="18" r="1.6"/><circle cx="16" cy="18" r="1.6"/></svg>
+      </span>
+      <div class="admin-row-main">
+        <div class="admin-row-name">${s.name}</div>
+        <div class="admin-row-meta">
+          <span class="badge-type conditional">${s.active ? 'Active' : 'Inactive'}</span>
+          <span class="admin-row-trigger">${s.conditionLabel}</span>
+        </div>
+        <div class="admin-row-meta" style="margin-bottom:6px;">
+          <span class="admin-row-trigger">Highlights: ${s.targetLabel}</span>
+        </div>
+        <p class="admin-row-message">"${s.title}" — ${s.description}</p>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="openTourStepEditor('${s.id}')">Edit</button>
+    </div>
+  `).join('');
+  attachTourDragHandlers();
+}
+
+function attachTourDragHandlers(){
+  const container = document.getElementById('tourStepsList');
+  let draggedId = null;
+  container.querySelectorAll('.admin-row').forEach(row=>{
+    row.addEventListener('dragstart', ()=>{ draggedId = row.dataset.id; row.classList.add('dragging'); });
+    row.addEventListener('dragend', ()=>{
+      row.classList.remove('dragging');
+      container.querySelectorAll('.admin-row').forEach(r=>r.classList.remove('drag-over'));
+    });
+    row.addEventListener('dragover', (e)=>{
+      e.preventDefault();
+      if(row.dataset.id !== draggedId) row.classList.add('drag-over');
+    });
+    row.addEventListener('dragleave', ()=> row.classList.remove('drag-over'));
+    row.addEventListener('drop', (e)=>{
+      e.preventDefault();
+      row.classList.remove('drag-over');
+      const targetId = row.dataset.id;
+      if(!draggedId || draggedId === targetId) return;
+      reorderTourSteps(draggedId, targetId);
+    });
+  });
+}
+
+function reorderTourSteps(draggedId, targetId){
+  const fromIdx = TOUR_STEPS.findIndex(s => s.id === draggedId);
+  const toIdx = TOUR_STEPS.findIndex(s => s.id === targetId);
+  const [moved] = TOUR_STEPS.splice(fromIdx, 1);
+  TOUR_STEPS.splice(toIdx, 0, moved);
+  renderTourStepsList();
+}
+
+let editingTourStepId = null;
+function openTourStepEditor(id){
+  editingTourStepId = id;
+  const step = TOUR_STEPS.find(s => s.id === id);
+  document.getElementById('tourStepEditorTitle').textContent = 'Edit Step';
+  document.getElementById('ts_name').value = step.name;
+  document.getElementById('ts_conditionDisplay').innerHTML = `<span>${step.conditionLabel}</span>`;
+  document.getElementById('ts_targetDisplay').innerHTML = `<span>${step.targetLabel}</span>`;
+  document.getElementById('ts_title').value = step.title;
+  document.getElementById('ts_description').value = step.description;
+  document.getElementById('ts_active').checked = step.active;
+  openModal('overlayTourStepEditor');
+}
+function saveTourStepEditor(){
+  const step = TOUR_STEPS.find(s => s.id === editingTourStepId);
+  if(!step) return;
+  step.name = document.getElementById('ts_name').value.trim() || step.name;
+  step.title = document.getElementById('ts_title').value.trim() || step.title;
+  step.description = document.getElementById('ts_description').value.trim() || step.description;
+  step.active = document.getElementById('ts_active').checked;
+  closeModal('overlayTourStepEditor');
+  renderTourStepsList();
+}
+</script>
+</body>
+</html>

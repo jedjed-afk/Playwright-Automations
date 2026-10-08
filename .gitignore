@@ -1,0 +1,21 @@
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+/playwright/.env/
+.env
+.claude
+.playwright-cli
+.playwright-mcp
+.mcp.json
+/*.yml 
+bun.lock 
+.vscode
+tests/Registration/employer-reg-validation.spec.js
+tests/Registration/employer-reg.spec.js
+tests/Registration/jobsik-reg-qeb-all-options.spec.js
+tests/Registration/jobsik-reg-qeb.spec.js
