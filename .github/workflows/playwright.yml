@@ -41,16 +41,44 @@ jobs:
     - name: Install Google Chrome
       run: npx playwright install --with-deps chrome
 
-    # Exposes every repo secret (WYO_DEV_LOGIN, OR_PASS, ...) as an env var, so
-    # process.env.X works exactly like the local .env without listing each name here.
-    - name: Load secrets into environment
-      env:
-        SECRETS_JSON: ${{ toJSON(secrets) }}
-      run: |
-        echo "$SECRETS_JSON" | jq -r 'to_entries[] | select(.key != "github_token") | "\(.key)<<__SECRET_EOF__\n\(.value)\n__SECRET_EOF__"' >> "$GITHUB_ENV"
-
     - name: Run Playwright tests
       env:
+        # Repo secrets the tests read via process.env - add a line here when a test needs a new one
+        WYO_DEV_LOGIN: ${{ secrets.WYO_DEV_LOGIN }}
+        DEV_PASS: ${{ secrets.DEV_PASS }}
+        WYO_OLDDEV_LOGIN: ${{ secrets.WYO_OLDDEV_LOGIN }}
+        OLD_DEV_PASS: ${{ secrets.OLD_DEV_PASS }}
+        WYO_PPP_LOGIN: ${{ secrets.WYO_PPP_LOGIN }}
+        PPP_PASS: ${{ secrets.PPP_PASS }}
+        CASEMAN_WYO_EMAIL: ${{ secrets.CASEMAN_WYO_EMAIL }}
+        CENTERMAN_EMAIL: ${{ secrets.CENTERMAN_EMAIL }}
+        CENTERMAN_DEV_PASS: ${{ secrets.CENTERMAN_DEV_PASS }}
+        CENTERMAN_PPP_PASS: ${{ secrets.CENTERMAN_PPP_PASS }}
+        STATE_AD_EMAIL_DEV: ${{ secrets.STATE_AD_EMAIL_DEV }}
+        STATE_AD_DEV_PASS: ${{ secrets.STATE_AD_DEV_PASS }}
+        STATE_AD_EMAIL_PPP: ${{ secrets.STATE_AD_EMAIL_PPP }}
+        STATE_AD_PPP_PASS: ${{ secrets.STATE_AD_PPP_PASS }}
+        SUPERAD_WYO_PPP_EMAIL: ${{ secrets.SUPERAD_WYO_PPP_EMAIL }}
+        SUPERAD_WYO_PPP_PASS: ${{ secrets.SUPERAD_WYO_PPP_PASS }}
+        JOBSIK_NAME: ${{ secrets.JOBSIK_NAME }}
+        JOBSIK_EMAIL: ${{ secrets.JOBSIK_EMAIL }}
+        JOBSIK_PASS: ${{ secrets.JOBSIK_PASS }}
+        JOBSIK_DUMPONE_PASS: ${{ secrets.JOBSIK_DUMPONE_PASS }}
+        JOBSIK_DUMPTWO_PASS: ${{ secrets.JOBSIK_DUMPTWO_PASS }}
+        JOBSIK_DUMPTHREE_PASS: ${{ secrets.JOBSIK_DUMPTHREE_PASS }}
+        WYO_JOBSIK_REG: ${{ secrets.WYO_JOBSIK_REG }}
+        OREGON_LOGIN: ${{ secrets.OREGON_LOGIN }}
+        OR_PASS: ${{ secrets.OR_PASS }}
+        CASEMAN_OR_EMAIL: ${{ secrets.CASEMAN_OR_EMAIL }}
+        CENTERMAN_OR_EMAIL: ${{ secrets.CENTERMAN_OR_EMAIL }}
+        CENTERMAN_OR_PASS: ${{ secrets.CENTERMAN_OR_PASS }}
+        VOUCHERREV_OR_EMAIL: ${{ secrets.VOUCHERREV_OR_EMAIL }}
+        VOUCHERREV_OR_PASS: ${{ secrets.VOUCHERREV_OR_PASS }}
+        OR_UAT_CASEMAN_EMAIL: ${{ secrets.OR_UAT_CASEMAN_EMAIL }}
+        OR_UAT_CASEMAN_PASS: ${{ secrets.OR_UAT_CASEMAN_PASS }}
+        OR_UAT_STATEAD_EMAIL: ${{ secrets.OR_UAT_STATEAD_EMAIL }}
+        OR_UAT_STATEAD_PASS: ${{ secrets.OR_UAT_STATEAD_PASS }}
+
         # Release/scheduled runs use the @release tag; manual runs use the form inputs
         TEST_PATH: ${{ github.event.inputs.path || 'tests' }}
         TEST_GREP: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.grep || '@release' }}
