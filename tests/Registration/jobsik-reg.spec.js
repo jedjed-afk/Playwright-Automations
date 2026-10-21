@@ -1,12 +1,8 @@
 
-  const { test } =
+  const { test , expect } =
   require('@playwright/test');
   require('dotenv').config();
 
-
-  /// 
-
-  
   // This Test is written by Jade of Eagle Team
   // With check wrong Zip code (1111) (22222)
   // SSN 8-digits only , 13 digits
@@ -14,34 +10,38 @@
   test('Jobseeker Registaration @release', async ({ page }) => {
   test.setTimeout(15 * 60 * 1000);
 
-  await page.goto('https://www.wyo-platform-pre-prod.careeredgebeta.com/employer-jobseeker/job-seeker/registration'); // PPP
+  //await page.goto('https://www.wyo-platform-pre-prod.careeredgebeta.com/employer-jobseeker/job-seeker/registration'); // PPP
   //await page.goto('https://www.wyo-platform-dev.careeredgebeta.com/employer-jobseeker/job-seeker/registration'); // Dev
-  //await page.goto(process.env.WYO_JOBSIK_REG); // NEW Dev
-  //await page.goto('https://www.oregon-dev.careeredgebeta.com/employer-jobseeker/job-seeker/registration'); // Oregon
+  await page.goto('https://www.wyo-dev.careeredgebeta.com/employer-jobseeker/job-seeker/registration'); // NEWDev
   
+  //await page.goto('https://www.oregon-edge-dev.careeredgebeta.com/employer-jobseeker/job-seeker/registration'); // Oregon
+  
+ const RUN_ID = Date.now().toString();
+ const SSN = '2' + RUN_ID.slice(-8); // valid 9-digit SSN
+ const FISRT_NAME = 'Jade ' + RUN_ID.slice(-6).split('').map(d => String.fromCharCode(97 + Number(d))).join(''); // e.g. "Eh bcdefg"
+ const EMAIL = `ajregunay+${RUN_ID}@careerteam.com`;
 
 
   ///////////////////// 1st Page ///////////////////////////
   await page.getByRole('textbox', { name: 'First Name *' }).click();
-  await page.getByRole('textbox', { name: 'First Name *' }).fill('Pop'); //change this
+  await page.getByRole('textbox', { name: 'First Name *' }).fill(FISRT_NAME); //change this
   await page.getByRole('textbox', { name: 'Last Name *' }).click();
   await page.getByRole('textbox', { name: 'Last Name *' }).fill('Eh Eh');  //change this
   await page.getByRole('textbox', { name: 'Email You may be contacted' }).click();
-  await page.getByRole('textbox', { name: 'Email You may be contacted' }).fill('ajregunay+pop@careerteam.com'); //change this
+  await page.getByRole('textbox', { name: 'Email You may be contacted' }).fill(EMAIL); //change this
   await page.getByRole('textbox', { name: 'Password Create a secure' }).click();
-  await page.getByRole('textbox', { name: 'Password Create a secure' }).fill('High_Towers008!'); //Not_jed123!
+  await page.getByRole('textbox', { name: 'Password Create a secure' }).fill(process.env.JOBSIK_PASS); //Not_jed123!
   await page.getByRole('textbox', { name: 'Confirm Password *' }).click();
-  await page.getByRole('textbox', { name: 'Confirm Password *' }).fill('High_lowers007!');
+  await page.getByRole('textbox', { name: 'Confirm Password *' }).fill(process.env.JOBSIK_PASS);
   await page.getByRole('textbox', { name: 'Social Security Number (SSN) Enter your Social Security Number without using' }).click();
-  await page.getByRole('textbox', { name: 'Social Security Number (SSN) Enter your Social Security Number without using' }).fill('21275256'); //change this
+  await page.getByRole('textbox', { name: 'Social Security Number (SSN) Enter your Social Security Number without using' }).fill('21235256'); //change this
   await page.getByRole('textbox', { name: 'Confirm Social Security' }).click();
-  await page.getByRole('textbox', { name: 'Confirm Social Security' }).fill('21275256'); //match with line 17
+  await page.getByRole('textbox', { name: 'Confirm Social Security' }).fill('21235256'); //match with line 17
   await page.getByRole('textbox', { name: 'Zip Code Enter the Zip Code' }).click();
   await page.getByRole('textbox', { name: 'Zip Code Enter the Zip Code' }).fill('82801');
   //await page.locator('.fa.ftrtrra-calendar').click();
   //await page.locator('.fa.fa-calendar').click();
   await page.getByRole('textbox', { name: 'Date of Birth Select your' }).click();
-  await page.pause();
   await page.getByRole('textbox', { name: 'Date of Birth Select your' }).fill('08/29/2007_'); //19
   //await page.getByRole('textbox', { name: 'Date of Birth Select your' }).fill('09/28/2012_'); //14
   await page.waitForTimeout(2000);
@@ -71,9 +71,9 @@
   await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
 
   await page.getByRole('textbox', { name: 'Social Security Number (SSN) Enter your Social Security Number without using' }).click();
-  await page.getByRole('textbox', { name: 'Social Security Number (SSN) Enter your Social Security Number without using' }).fill('212751564'); //change this
+  await page.getByRole('textbox', { name: 'Social Security Number (SSN) Enter your Social Security Number without using' }).fill(SSN); //change this
   await page.getByRole('textbox', { name: 'Confirm Social Security' }).click();
-  await page.getByRole('textbox', { name: 'Confirm Social Security' }).fill('212751564'); //match with line 17
+  await page.getByRole('textbox', { name: 'Confirm Social Security' }).fill(SSN); //match with line 17
   
   await page.getByRole('button', { name: 'Next button. Click to go to' }).click();
   
@@ -170,121 +170,130 @@
 
 
  
-  /////////// Login for Admin///////////
-
-  await page.getByRole('button', { name: 'Login' }).click();
-  await page.getByRole('textbox', { name: 'Email' }).click();
-  await page.getByRole('textbox', { name: 'Email' }).fill(process.env.CASEMAN_WYO_EMAIL);
-  await page.getByRole('textbox', { name: 'Password' }).click();
-
-  await page.getByRole('textbox', { name: 'Password' }).fill(process.env.PPP_PASS);  // PPP
-  //await page.getByRole('textbox', { name: 'Password' }).fill(process.env.OLD_DEV_PASS);
-  await page.getByRole('button', { name: 'Login' }).click();
-  //login//
+    /////////// Login for Admin///////////
   
-  await page.getByRole('button', { name: 'Individuals' }).click();
-  await page.getByRole('tab', { name: 'All Individuals' }).click();
-  await page.pause();
-  //await page.getByRole('searchbox', { name: 'Search' }).click();
-  //await page.getByRole('searchbox', { name: 'Search' }).fill('560471');
-  //await page.getByRole('searchbox', { name: 'Search' }).fill(process.env.JOBSIK_NAME);
-  //await page.getByRole('button', { name: 'search' }).click();
-  //await page.waitForLoadState('domcontentloaded');
-  //await page.waitForLoadState('networkidle');
-  //await page.pause();
-  await page.getByRole('cell', { name: process.env.JOBSIK_NAME, exact: true }).waitFor({ state: 'visible', timeout: 60000 });
-  await page.getByRole('cell', { name: process.env.JOBSIK_NAME, exact: true }).click(); 
-
-
+    await page.getByRole('button', { name: 'Login' }).click();
+    await page.getByRole('textbox', { name: 'Email' }).click();
+    await page.getByRole('textbox', { name: 'Email' }).fill(process.env.CASEMAN_WYO_EMAIL);
+    await page.getByRole('textbox', { name: 'Password' }).click();
+  
+    await page.getByRole('textbox', { name: 'Password' }).fill(process.env.PPP_PASS);  // PPP
+    //await page.getByRole('textbox', { name: 'Password' }).fill(process.env.OLD_DEV_PASS);
+    await page.getByRole('button', { name: 'Login' }).click();
+    //login//
+    
+    await page.getByRole('button', { name: 'Individuals' }).click();
+    await page.getByRole('tab', { name: 'All Individuals' }).click();
+    await page.pause();
+    //await page.getByRole('searchbox', { name: 'Search' }).click();
+    //await page.getByRole('searchbox', { name: 'Search' }).fill('560471');
+    //await page.getByRole('searchbox', { name: 'Search' }).fill(process.env.JOBSIK_NAME);
+    //await page.getByRole('button', { name: 'search' }).click();
+    //await page.waitForLoadState('domcontentloaded');
+    //await page.waitForLoadState('networkidle');
+    await page.pause();
+    await page.getByRole('cell', { name: new RegExp(FISRT_NAME) }).waitFor({ state: 'visible', timeout: 60000 });
+    await page.getByRole('cell', { name: new RegExp(FISRT_NAME) }).click(); 
+  
+  
   await page.getByRole('tab', { name: 'RI Activities' }).click();
-
-  const table = page.getByRole('table');
-
-  // Headers
-  await expect(table.getByRole('columnheader')).toContainText([
-  'Activity', 'Actual Begin', 'Actual End Date', 'Completion Code', 'Service Created by',
-  ]);
-
- // Row values (date is today, so compute it)
-const today = new Date().toLocaleDateString('en-US', {
-  timeZone:'America/Denver', month: '2-digit', day: '2-digit', year: 'numeric',
-}); // // "10/07/2026"
-
-  const row = table.getByRole('row', { name: /003 - RI - Self-Service W@W Registration/ });
-  await expect(row.getByRole('cell')).toContainText([
-  '003 - RI - Self-Service W@W Registration', today, today, 'Successful Completion', 'System',
-  ]);
-   
-
-  ////// Jobseeker Login //////////////
-  await page.getByRole('button', { name: 'Profile options' }).click();
-  await page.getByText('Logout').click();
   
-  await page.getByRole('button', { name: 'Login' }).click();
-  await page.getByRole('textbox', { name: 'Email' }).click();
-  await page.getByRole('textbox', { name: 'Email' }).fill(process.env.JOBSIK_EMAIL); //EDIT -- input email of the created jobseeker
-  await page.getByRole('textbox', { name: 'Password' }).click();
+    const table = page.getByRole('table');
   
-  await page.getByRole('textbox', { name: 'Password' }).fill(process.env.JOBSIK_PASS); //EDIT -- input passsword
-  await page.getByRole('button', { name: 'Login' }).click();
+    // Headers
+    await expect(table.getByRole('columnheader')).toContainText([
+    'Activity', 'Actual Begin', 'Actual End Date', 'Completion Code', 'Service Created by',
+    ]);
   
-  //login//
+   // Row values (date is today, so compute it)
+  const today = new Date().toLocaleDateString('en-US', {
+    timeZone:'America/Denver', month: '2-digit', day: '2-digit', year: 'numeric',
+  }); // // "10/07/2026"
   
-  await page.pause();
-  await page.getByRole('button', { name: 'Notifications' }).click(); 
-  await page.getByText('Welcome to Hire WYO').click();
+    const row = table.getByRole('row', { name: /003 - RI - Self-Service W@W Registration/ });
+    await expect(row.getByRole('cell')).toContainText([
+    '003 - RI - Self-Service W@W Registration', today, today, 'Successful Completion', 'System',
+    ]);
+     
   
-  const dialog = page.getByRole('dialog', { name: 'Welcome to Hire WYO' });
-  await expect(dialog).toBeVisible();
+    ////// Jobseeker Login //////////////
+    await page.getByRole('button', { name: 'Profile options' }).click();
+    await page.getByText('Logout').click();
+    
+    await page.getByRole('button', { name: 'Login' }).click();
+    await page.getByRole('textbox', { name: 'Email' }).click();
+    await page.getByRole('textbox', { name: 'Email' }).fill(EMAIL);
+    await page.getByRole('textbox', { name: 'Password' }).click();
+    
+    await page.getByRole('textbox', { name: 'Password' }).fill(process.env.JOBSIK_PASS); //EDIT -- input passsword
+    await page.getByRole('button', { name: 'Login' }).click();
+    
+    //login//
+    
+    await page.getByRole('button', { name: 'Notifications' }).click(); 
+    await page.getByText('Welcome to Hire WYO').click();
+    
+    const dialog = page.getByRole('dialog', { name: 'Welcome to Hire WYO' });
+    await expect(dialog).toBeVisible();
+    
+    // Title and timestamp (dynamic, so match the format)
+    await expect(dialog.getByRole('heading', { name: 'Welcome to Hire WYO' })).toBeVisible();
+    await expect(dialog).toContainText(/\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2} (AM|PM)/);
+    
+    // Body content
+    await expect(dialog).toContainText('Your new account has been created on HireWYO.');
+    await expect(dialog).toContainText('Welcome to HireWYO!');
+    
+    // Links
+    await expect(dialog.getByRole('link', { name: 'hire.wyo.gov/contact-us' })).toHaveAttribute('href', /hire\.wyo\.gov\/contact-us/);
+    await expect(dialog.getByRole('link', { name: 'here', exact: true })).toBeVisible();
+    
+    await page.getByRole('button', { name: 'close' }).click();
   
-  // Title and timestamp (dynamic, so match the format)
-  await expect(dialog.getByRole('heading', { name: 'Welcome to Hire WYO' })).toBeVisible();
-  await expect(dialog).toContainText(/\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2} (AM|PM)/);
+    await page.pause();
   
-  // Body content
-  await expect(dialog).toContainText('Your new account has been created on HireWYO.');
-  await expect(dialog).toContainText('Welcome to HireWYO!');
+    ////// Forgot Password (must be logged out) //////////////
+    await page.getByRole('button', { name: 'My Profile' }).click();
+    await page.getByRole('menuitem', { name: 'Logout' }).click();
+    await page.getByRole('button', { name: 'Login' }).click();
   
-  // Links
-  await expect(dialog.getByRole('link', { name: 'hire.wyo.gov/contact-us' })).toHaveAttribute('href', /hire\.wyo\.gov\/contact-us/);
-  await expect(dialog.getByRole('link', { name: 'here', exact: true })).toBeVisible();
-  
-  await page.getByRole('button', { name: 'close' }).click();
-
-  await page.pause();
-
-  await page.getByRole('button', { name: 'Forgot password' }).click();
-  await page.getByRole('textbox', { name: 'Email' }).click();
-  await page.getByRole('textbox', { name: 'Email' }).fill('ajregunay+ninis@careerteam.com');
-  await page.getByRole('button', { name: 'Continue' }).click();
-  // No Caps
-  await page.getByRole('textbox', { name: 'New Password', exact: true }).click();
-  await page.getByRole('textbox', { name: 'New Password', exact: true }).fill('igh_lowers007@');
-  await page.getByRole('textbox', { name: 'Confirm New Password' }).click();
-  await page.getByRole('textbox', { name: 'Confirm New Password' }).fill('igh_lowers007@');
-  await page.getByRole('button', { name: 'Submit' }).click();
-  //No Number
-  await page.getByRole('textbox', { name: 'New Password', exact: true }).click();
-  await page.getByRole('textbox', { name: 'New Password', exact: true }).fill('High_lowers@');
-  await page.getByRole('textbox', { name: 'Confirm New Password' }).click();
-  await page.getByRole('textbox', { name: 'Confirm New Password' }).fill('High_lowers@');
-  await page.getByRole('button', { name: 'Submit' }).click();
-  // No Special Character
-  await page.getByRole('textbox', { name: 'New Password', exact: true }).click();
-  await page.getByRole('textbox', { name: 'New Password', exact: true }).fill('High_lowers007');
-  await page.getByRole('textbox', { name: 'Confirm New Password' }).click();
-  await page.getByRole('textbox', { name: 'Confirm New Password' }).fill('High_lowers007');
-  await page.getByRole('button', { name: 'Submit' }).click();
-  //to do minmum 8 max 20
-  // lower case
-  await page.getByRole('textbox', { name: 'New Password', exact: true }).click();
-  await page.getByRole('textbox', { name: 'New Password', exact: true }).fill('High_lowers007@');
-  await page.getByRole('textbox', { name: 'Confirm New Password' }).click();
-  await page.getByRole('textbox', { name: 'Confirm New Password' }).fill('High_lowers007@');
-  await page.getByRole('button', { name: 'Submit' }).click();
-
-
-
+    await page.getByRole('button', { name: 'Forgot password' }).click();
+    await page.getByRole('textbox', { name: 'Email' }).click();
+    await page.getByRole('textbox', { name: 'Email' }).fill(EMAIL);
+    await page.getByRole('button', { name: 'Continue' }).click();
+    await expect(page.getByText('Reset your password')).toBeVisible();
+    const notMet = page.getByText('They do not meet the minimum requirements.');
+    // No Caps
+    await page.getByRole('textbox', { name: 'New Password', exact: true }).click();
+    await page.getByRole('textbox', { name: 'New Password', exact: true }).fill(process.env.JOBSIK_DUMPONE_PASS);
+    await page.getByRole('textbox', { name: 'Confirm New Password' }).click();
+    await page.getByRole('textbox', { name: 'Confirm New Password' }).fill(process.env.JOBSIK_DUMPONE_PASS);
+    await page.getByRole('button', { name: 'Submit' }).click();
+    await expect(notMet.first()).toBeVisible();
+    //No Number
+    await page.getByRole('textbox', { name: 'New Password', exact: true }).click();
+    await page.getByRole('textbox', { name: 'New Password', exact: true }).fill(process.env.JOBSIK_DUMPTWO_PASS);
+    await page.getByRole('textbox', { name: 'Confirm New Password' }).click();
+    await page.getByRole('textbox', { name: 'Confirm New Password' }).fill(process.env.JOBSIK_DUMPTWO_PASS);
+    await page.getByRole('button', { name: 'Submit' }).click();
+    await expect(notMet.first()).toBeVisible();
+    // No Special Character
+    await page.getByRole('textbox', { name: 'New Password', exact: true }).click();
+    await page.getByRole('textbox', { name: 'New Password', exact: true }).fill('Highlowers007'); // no special char (env JOBSIK_DUMPTHREE_PASS has '_' which counts as special)
+    await page.getByRole('textbox', { name: 'Confirm New Password' }).click();
+    await page.getByRole('textbox', { name: 'Confirm New Password' }).fill('Highlowers007'); // no special char (env JOBSIK_DUMPTHREE_PASS has '_' which counts as special)
+    await page.getByRole('button', { name: 'Submit' }).click();
+    await expect(notMet.first()).toBeVisible();
+    //to do minmum 8 max 20
+    // lower case
+    await page.getByRole('textbox', { name: 'New Password', exact: true }).click();
+    await page.getByRole('textbox', { name: 'New Password', exact: true }).fill(process.env.JOBSIK_PASS);
+    await page.getByRole('textbox', { name: 'Confirm New Password' }).click();
+    await page.getByRole('textbox', { name: 'Confirm New Password' }).fill(process.env.JOBSIK_PASS);
+    await expect(notMet).toHaveCount(0);
+    await page.pause(); /// enter the 6-digit Code sent to EMAIL manually, then resume
+    await page.getByRole('button', { name: 'Submit' }).click();
+ 
 
   
 
