@@ -191,7 +191,11 @@
   //login//
   
   await page.getByRole('button', { name: 'Individuals' }).click();
-  await page.getByRole('tab', { name: 'All Individuals' }).click();
+  // The tab click can be lost while the list is still loading, so re-click until it sticks
+  await expect(async () => {
+    await page.getByRole('tab', { name: 'All Individuals' }).click();
+    await expect(page.getByRole('tabpanel', { name: 'All Individuals' })).toBeVisible({ timeout: 3000 });
+  }).toPass({ timeout: 60000 });
   //await page.getByRole('searchbox', { name: 'Search' }).click();
   //await page.getByRole('searchbox', { name: 'Search' }).fill('560471');
   //await page.getByRole('searchbox', { name: 'Search' }).fill(process.env.JOBSIK_NAME);
