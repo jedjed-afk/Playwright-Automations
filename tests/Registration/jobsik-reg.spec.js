@@ -43,12 +43,15 @@
   await page.getByRole('textbox', { name: 'Zip Code' }).click();
   await page.getByRole('textbox', { name: 'Zip Code' }).fill('82801');
 
-  await page.getByRole('textbox', { name: 'Date of Birth' }).click();
-  await page.getByRole('textbox', { name: 'Date of Birth' }).fill('08/29/2007_'); //19
-  //await page.getByRole('textbox', { name: 'Date of Birth' }).fill('09/28/2012_'); //14
-  await page.waitForTimeout(2000);
-  
-  await page.getByRole('textbox', { name: 'Date of Birth' }).press('Enter');
+  // The masked date field sometimes drops the typed value on slower machines (CI), so retry until it sticks
+  const dob = page.getByRole('textbox', { name: 'Date of Birth' });
+  await expect(async () => {
+    await dob.click();
+    await dob.fill('08/29/2007_'); //19
+    //await dob.fill('09/28/2012_'); //14
+    await dob.press('Enter');
+    await expect(dob).toHaveValue(/08\/29\/2007/, { timeout: 3000 });
+  }).toPass({ timeout: 30000 });
   await page.getByRole('combobox', { name: 'Sexual Orientation' }).click();
   await page.getByRole('option', { name: 'Straight/Heterosexual' }).click();
   // Sexual Orientation options: Straight/Heterosexual | Gay/Lesbian or Homosexual | Bisexual | Another sexual orientation | I Do Not Wish to Answer
