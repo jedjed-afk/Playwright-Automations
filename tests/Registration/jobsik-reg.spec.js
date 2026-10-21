@@ -11,7 +11,7 @@
   // With check wrong Zip code (1111) (22222)
   // SSN 8-digits only , 13 digits
   // check auto fire wow
-  test('Jobseeker Registaration', async ({ page }) => {
+  test('Jobseeker Registaration @release', async ({ page }) => {
   test.setTimeout(15 * 60 * 1000);
 
   await page.goto('https://www.wyo-platform-pre-prod.careeredgebeta.com/employer-jobseeker/job-seeker/registration'); // PPP
