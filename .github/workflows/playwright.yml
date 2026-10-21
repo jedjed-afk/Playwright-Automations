@@ -1,27 +1,77 @@
 name: Playwright Tests
+
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+  # Manual "Run workflow" button in the Actions tab
+  workflow_dispatch:
+    inputs:
+      path:
+        description: 'Test folder or file to run (e.g. tests/WIOA, "tests/WYO DEV"). Leave as "tests" for everything.'
+        required: true
+        default: 'tests'
+      grep:
+        description: 'Only run tests whose title matches this (e.g. @release, @smoke, "WIOA adult"). Leave empty for all tests in the path.'
+        required: false
+        default: '@release'
+
+  # Fired by the app repo's release workflow (see README "CI" section)
+  repository_dispatch:
+    types: [app-release]
+
+  # Optional nightly regression - uncomment to enable (times are UTC)
+  # schedule:
+  #   - cron: '0 10 * * 1-5'
+
+# Don't let two runs hit the same test accounts at the same time
+concurrency:
+  group: playwright-tests
+  cancel-in-progress: false
+
 jobs:
   test:
-    timeout-minutes: 60
+    timeout-minutes: 300
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
+        cache: npm
     - name: Install dependencies
       run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
+    - name: Install Google Chrome
+      run: npx playwright install --with-deps chrome
+
+    # Exposes every repo secret (WYO_DEV_LOGIN, OR_PASS, ...) as an env var, so
+    # process.env.X works exactly like the local .env without listing each name here.
+    - name: Load secrets into environment
+      env:
+        SECRETS_JSON: ${{ toJSON(secrets) }}
+      run: |
+        echo "$SECRETS_JSON" | jq -r 'to_entries[] | select(.key != "github_token") | "\(.key)<<__SECRET_EOF__\n\(.value)\n__SECRET_EOF__"' >> "$GITHUB_ENV"
+
     - name: Run Playwright tests
-      run: npx playwright test
+      env:
+        # Release/scheduled runs use the @release tag; manual runs use the form inputs
+        TEST_PATH: ${{ github.event.inputs.path || 'tests' }}
+        TEST_GREP: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.grep || '@release' }}
+        RELEASE_VERSION: ${{ github.event.client_payload.version }}
+      run: |
+        echo "Path: $TEST_PATH | Grep: ${TEST_GREP:-<none>} | App version: ${RELEASE_VERSION:-n/a}"
+        if [ -n "$TEST_GREP" ]; then
+          npx playwright test "$TEST_PATH" --grep "$TEST_GREP"
+        else
+          npx playwright test "$TEST_PATH"
+        fi
+
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
-        name: playwright-report
+        name: playwright-report-${{ github.run_number }}
         path: playwright-report/
         retention-days: 30
+    - uses: actions/upload-artifact@v4
+      if: ${{ failure() }}
+      with:
+        name: test-results-${{ github.run_number }}
+        path: test-results/
+        retention-days: 14

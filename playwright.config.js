@@ -14,6 +14,10 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
  */
 export default defineConfig({
   testDir: './tests',
+  /* Scratch files and admin scripts (e.g. permission updates) must never run in CI. */
+  testIgnore: process.env.CI
+    ? ['**/_tmp/**', '**/HTML Mock Ups/**', '**/or-permission/**', '**/dump*.spec.js', '**/example.spec.js', '**/seed.spec.ts']
+    : undefined,
   /* Run tests in files in parallel */
   /*Maximum time one test can run for. */
   //timeout: 10 * 1000,  ////////////////////////////////////
@@ -29,11 +33,11 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: process.env.CI ? [['html', { open: 'never' }], ['github']] : 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     //video: 'on',///////////////////////////////////////////////////////////
-    launchOptions: {slowMo: 1000}, ///////////////////////////////////////
+    //aunchOptions: {slowMo: 1000}, ///////////////////////////////////////
     // Without this, a single click()/locator wait on an element that never appears blocks until the
     // whole test's timeout (up to 15min in some WIOA specs) instead of failing fast with a clear error.
     actionTimeout: 30000,
@@ -45,7 +49,7 @@ export default defineConfig({
 
     //trace: 'on-first-retry', ///////////////////////////////////////////// /
     //trace: 'on', // always on in every test
-    trace: 'off', // always off in every test
+    trace: process.env.CI ? 'retain-on-failure' : 'off', // CI keeps a trace for failed tests only
     // trace: 'retain-on-failure', //only when test fails
 
   },
