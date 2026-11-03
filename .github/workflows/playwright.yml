@@ -18,9 +18,9 @@ on:
     types: [app-release]
 
   # Optional nightly regression - uncomment to enable (times are UTC)
-  # schedule:
+  schedule:
   #   - cron: '0 10 * * 1-5'
-  #   - cron: '0 22 * * 1-5'
+    - cron: '0 22 * * 1-5'
 
 # Don't let two runs hit the same test accounts at the same time
 concurrency:
